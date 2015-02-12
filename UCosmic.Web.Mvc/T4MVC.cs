@@ -39,6 +39,7 @@ public static class MVC
     public static UCosmic.Web.Mvc.Controllers.PeopleController People = new UCosmic.Web.Mvc.Controllers.T4MVC_PeopleController();
     public static UCosmic.Web.Mvc.Controllers.RepsController Reps = new UCosmic.Web.Mvc.Controllers.T4MVC_RepsController();
     public static UCosmic.Web.Mvc.Controllers.SamlMetadataController SamlMetadata = new UCosmic.Web.Mvc.Controllers.T4MVC_SamlMetadataController();
+    public static UCosmic.Web.Mvc.Controllers.StudentsController Students = new UCosmic.Web.Mvc.Controllers.T4MVC_StudentsController();
     public static UCosmic.Web.Mvc.Controllers.SummaryController Summary = new UCosmic.Web.Mvc.Controllers.T4MVC_SummaryController();
     public static UCosmic.Web.Mvc.Controllers.TenancyController Tenancy = new UCosmic.Web.Mvc.Controllers.T4MVC_TenancyController();
     public static UCosmic.Web.Mvc.Controllers.UsersController Users = new UCosmic.Web.Mvc.Controllers.T4MVC_UsersController();
