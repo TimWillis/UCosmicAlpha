@@ -25,6 +25,7 @@ namespace UCosmic.Web.Mvc.Controllers
         public virtual ActionResult Index()
         {
             var tenancy = Request.Tenancy() ?? new Tenancy();
+  
 
             // first check style domain
             if (!string.IsNullOrWhiteSpace(tenancy.StyleDomain) && !"default".Equals(tenancy.StyleDomain))

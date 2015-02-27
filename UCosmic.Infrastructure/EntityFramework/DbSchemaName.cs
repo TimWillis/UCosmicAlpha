@@ -16,5 +16,6 @@
         public const string External = "External";
         public const string HomeSection = "HomeSection";
         public const string HomeAlert = "HomeAlert";
+        public const string Students = "Students";
     }
 }

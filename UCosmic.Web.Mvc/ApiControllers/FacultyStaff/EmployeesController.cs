@@ -129,6 +129,7 @@ namespace UCosmic.Web.Mvc.ApiControllers
                     locationCount = model.DistinctBy(x => new { x.placeId }).Count();
                     activityCount = model.DistinctBy(x => new { x.id }).Count();
                     personCount = model.DistinctBy(x => new { x.personId }).Count();
+              
             }
 
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq.Expressions;
 using System.Linq;
 using System.Web.Mvc;
@@ -14,14 +15,13 @@ using LinqToExcel;
 
 namespace UCosmic.Web.Mvc.Controllers
 {
-    public partial class StudentsController : Controller
-    {
+    public partial class StudentsController : Controller{
 
         [GET("/students/")]
         public virtual ActionResult Index()
         {
             StudentActivityRepository students = new StudentActivityRepository();
-            IList<StudentImportApi> content = students.StudentActivityTypes();
+            IList<StudentImportApi> content = students.getStudentActivities();
             return View();
         }
 
@@ -36,19 +36,17 @@ namespace UCosmic.Web.Mvc.Controllers
         {
             //Check if the file is null - we'll probably want to return an error in this case
             if (file != null && file.ContentLength > 0 && file.ContentLength < 10000000)
-           { 
-                var excel = new ExcelQueryFactory("C:/Users/trex/Desktop/testdata.xlsx");
-                var data = from c in excel.Worksheet("StudentActivity") select c;
-                string test = "debug";
+           {
+                var fileName = Path.GetFileName(file.FileName);
+                var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
+                file.SaveAs(path);
+
+                var excel = new ExcelQueryFactory(path);
+                IList<StudentImportApi> data = (from c in excel.Worksheet<StudentImportApi>("StudentActivity") select c).ToList<StudentImportApi>();
+
+                StudentActivityRepository repository = new StudentActivityRepository();
+                repository.uploadStudents(data);
             }
-
-
-            
-
-
-
-
-          
             return View();
         }
         
