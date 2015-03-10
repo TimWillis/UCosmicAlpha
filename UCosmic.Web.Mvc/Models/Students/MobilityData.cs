@@ -15,4 +15,12 @@ namespace UCosmic.Web.Mvc.Models
         public int? foreignEstablishmentId { get; set; } //maybe make this optional?
     }
 
+  /*  public class Student
+    {
+        public IList<StudentAffiliationData> affiliation;
+        public IList<StudentInformationData> info;
+        public IList<StudentLevelData> level;
+        public IList<StudentMobilityData>
+    }*/
+
 }

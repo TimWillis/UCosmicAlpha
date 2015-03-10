@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+
 
 namespace UCosmic.Web.Mvc.Models
 {
@@ -7,6 +9,7 @@ namespace UCosmic.Web.Mvc.Models
     {
         public int externalId { get; set; }
         public string status { get; set; }//in/out
+        public int rank { get; set; }
         public string level {get; set;}//must match the level in the level table
         //rank//not needed as manually added - later have form for members to update
         public string termDescription {get; set;}
@@ -20,5 +23,7 @@ namespace UCosmic.Web.Mvc.Models
         public string ucosmicForeignOfficialName {get; set;}
         public string ucosmicForeignCode {get; set;}
     }
+
+   
 
 }

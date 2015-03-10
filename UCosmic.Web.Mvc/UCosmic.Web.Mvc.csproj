@@ -23,7 +23,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
-    <TypeScriptToolsVersion>1.1</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>1.4</TypeScriptToolsVersion>
     <TypeScriptSourceMap>False</TypeScriptSourceMap>
     <TypeScriptModuleKind>none</TypeScriptModuleKind>
     <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
@@ -84,8 +84,12 @@
     <Reference Include="BeginCollectionItem">
       <HintPath>..\packages\BeginCollectionItem.1.2.1.0\lib\net35\BeginCollectionItem.dll</HintPath>
     </Reference>
-    <Reference Include="Dapper">
-      <HintPath>..\packages\Dapper.1.37\lib\net40\Dapper.dll</HintPath>
+    <Reference Include="Dapper, Version=1.38.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Dapper.1.38\lib\net40\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="Dapper.SimpleCRUD">
+      <HintPath>..\packages\Dapper.SimpleCRUD.1.8.4\lib\net40\Dapper.SimpleCRUD.dll</HintPath>
     </Reference>
     <Reference Include="Elmah, Version=1.2.14706.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -110,6 +114,12 @@
     </Reference>
     <Reference Include="ImageResizer.Mvc">
       <HintPath>..\packages\ImageResizer.Mvc.3.3.3\lib\ImageResizer.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="LinqToExcel">
+      <HintPath>..\packages\LinqToExcel.1.10.1\lib\LinqToExcel.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="LowercaseRoutesMVC4">
       <HintPath>..\packages\LowercaseRoutesMVC4.0.4.1\lib\LowercaseRoutesMVC4.dll</HintPath>
@@ -191,6 +201,15 @@
     </Reference>
     <Reference Include="Pluralize.Mvc">
       <HintPath>..\packages\Pluralizer.Mvc.0.3.0.1\lib\net40\Pluralize.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="Remotion">
+      <HintPath>..\packages\LinqToExcel.1.10.1\lib\Remotion.dll</HintPath>
+    </Reference>
+    <Reference Include="Remotion.Data.Linq">
+      <HintPath>..\packages\LinqToExcel.1.10.1\lib\Remotion.Data.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="Remotion.Interfaces">
+      <HintPath>..\packages\LinqToExcel.1.10.1\lib\Remotion.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="SimpleInjector, Version=2.6.0.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -344,6 +363,7 @@
     <Compile Include="ApiControllers\Home\HomeSectionController.cs" />
     <Compile Include="ApiControllers\Home\HomePhotoController.cs" />
     <Compile Include="ApiControllers\People\AffiliationsController.cs" />
+    <Compile Include="Controllers\StudentsController.cs" />
     <Compile Include="Controllers\SummaryController.cs" />
     <Compile Include="Factories\SqlConnectionFactory.cs" />
     <Compile Include="Helpers\SessionExtensions.cs" />
@@ -368,6 +388,16 @@
     <Compile Include="Models\Home\HomeSectionApiModel.cs" />
     <Compile Include="Models\Home\HomeSectionModel.cs" />
     <Compile Include="Models\Home\HomeModel.cs" />
+    <Compile Include="Models\Students\AffiliationsData.cs" />
+    <Compile Include="Models\Students\InformationData.cs" />
+    <Compile Include="Models\Students\LevelData.cs" />
+    <Compile Include="Models\Students\LoginData.cs" />
+    <Compile Include="Models\Students\MobilityData.cs" />
+    <Compile Include="Models\Students\ProgramData.cs" />
+    <Compile Include="Models\Students\StudentApi.cs" />
+    <Compile Include="Models\Students\StudentData.cs" />
+    <Compile Include="Models\Students\TermData.cs" />
+    <Compile Include="Models\Students\TermLinkData.cs" />
     <Compile Include="Models\Summary\ExpertiseSummaryApiModel.cs" />
     <Compile Include="Models\Summary\AffiliationSummaryApiModel.cs" />
     <Compile Include="Models\Summary\DegreeSummaryApiModel.cs" />
@@ -602,6 +632,7 @@
     <Compile Include="Repositories\EmployeeActivityTypeRepository.cs" />
     <Compile Include="Repositories\ActivityMapCounts.cs" />
     <Compile Include="Repositories\ActivitySnapshotRepository.cs" />
+    <Compile Include="Repositories\StudentsRepository.cs" />
     <Compile Include="Repositories\SummaryRepository.cs" />
     <Compile Include="RepsController.generated.cs">
       <DependentUpon>T4MVC.tt</DependentUpon>
@@ -610,6 +641,9 @@
       <DependentUpon>T4MVC.tt</DependentUpon>
     </Compile>
     <Compile Include="SharedController.generated.cs">
+      <DependentUpon>T4MVC.tt</DependentUpon>
+    </Compile>
+    <Compile Include="StudentsController.generated.cs">
       <DependentUpon>T4MVC.tt</DependentUpon>
     </Compile>
     <Compile Include="SummaryController.generated.cs">
@@ -5226,6 +5260,9 @@
     <Content Include="Views\Employees\Experts2.cshtml" />
     <Content Include="Views\Summary\_Bib.cshtml" />
     <Content Include="Views\Summary\Map.cshtml" />
+    <Content Include="Views\Students\Index.cshtml" />
+    <Content Include="Views\Students\New.cshtml" />
+    <Content Include="Views\Students\_FormFileAttachments.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
