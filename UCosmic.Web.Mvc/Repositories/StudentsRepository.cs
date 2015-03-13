@@ -18,24 +18,27 @@ namespace UCosmic.Repositories
     {
 
        
-        public IList<StudentImportApi> getStudentActivities()
+        public IList<StudentActivity> getStudentActivities()
         {
             SqlConnectionFactory connectionFactory = new SqlConnectionFactory();
-            const string sql = "select *  FROM [studentActivity] ";
+            const string sql = "select *  FROM [vw_MobilityDetail]";
             
-            IList<StudentImportApi> studentActivities = connectionFactory.SelectList<StudentImportApi>(DB.UCosmic, sql);
+            IList<StudentActivity> studentActivities = connectionFactory.SelectList<StudentActivity>(DB.UCosmic, sql);
 
             return studentActivities;
         }
 
 
 
-        public void uploadStudents(IList<StudentImportApi> students){
+
+
+        public int[] uploadStudents(IList<StudentImportApi> students){
             
             SqlConnectionFactory connectionFactory = new SqlConnectionFactory();
 
-           
 
+            int success = 0;
+            int fail = 0;
 
             foreach(StudentImportApi student in students){
 
@@ -46,34 +49,11 @@ namespace UCosmic.Repositories
                 */
 
                 //Check if term data exists
-                string sql = @"select id from [Students].[TermData] where name=@termDescription and startDate=@termStart and endDate=@termEnd";
-
-                try
-                {
-                    int id = (int)connectionFactory.ExecuteWithId(DB.UCosmic, sql, student, System.Data.CommandType.Text);
-                }
-                catch (System.InvalidOperationException e)
-                {
-                    //ID did not exist
-                    sql = @"insert into [Students].[TermData] VALUES(@termDescription, @termStart, @termEnd)" +
-                          @"SELECT CAST(SCOPE_IDENTITY() as int)";
-                    record.termId = (int)connectionFactory.ExecuteWithId(DB.UCosmic, sql, student, System.Data.CommandType.Text);
-                }
-
-                 //TODO: Find out what makes a program code unique
-                 sql = @"select id from [Students].[StudentProgramData] where code=@progCode";
-                 try
-                 {
-                     int id = (int)connectionFactory.ExecuteWithId(DB.UCosmic, sql, student, System.Data.CommandType.Text);
-                     record.programId = id;
-                 }
-                 catch (System.InvalidOperationException e)
-                 {
-                    //I don't have anything to insert here currently
-                 }
-
+                
+                
+                record.termId = getTermId(student, connectionFactory);                
                  
-                 sql = @"select RevisionId from [Establishments].[Establishment] where UCosmicCode=@UCosmicCode";
+                 string sql = @"select RevisionId from [Establishments].[Establishment] where RevisionId=@UCosmicCode";
                  try
                  {
                      int id = (int)connectionFactory.ExecuteWithId(DB.UCosmic, sql, student, System.Data.CommandType.Text);
@@ -84,7 +64,7 @@ namespace UCosmic.Repositories
                      //Return "establishment does not exist error"
                  }
 
-                 sql = @"select RevisionId from [Establishments].[Establishment] where UCosmicCode=@ucosmicForeignCode";
+                 sql = @"select RevisionId from [Establishments].[Establishment] where RevisionId=@ucosmicForeignCode";
                  try
                  {
                      int id = (int)connectionFactory.ExecuteWithId(DB.UCosmic, sql, student, System.Data.CommandType.Text);
@@ -96,9 +76,7 @@ namespace UCosmic.Repositories
                  }
 
 
-                //Level is a bit tricky due to dependence on establishmentId and code... Should I create a new object to pack these together?
-
-                //Create StudentLevelData object
+                //Look for leveldata object
                 StudentLevelData leveldata = new StudentLevelData();
                 leveldata.establishmentId=(int)record.establishmentId;
                 leveldata.name = student.level;
@@ -108,7 +86,7 @@ namespace UCosmic.Repositories
                  try
                  {
                      int id = (int)connectionFactory.ExecuteWithId(DB.UCosmic, sql, leveldata, System.Data.CommandType.Text);
-                     record.foreignEstablishmentId = id;
+                     record.levelId = id;
                  }
                  catch (System.InvalidOperationException e)
                  {
@@ -128,40 +106,76 @@ namespace UCosmic.Repositories
                      //do nothing currently
                  }
 
+                 StudentProgramData progData = new StudentProgramData();
+                 progData.establishmentId = (int)record.establishmentId;
+                 progData.isStandard = false;
+                 progData.name = student.progDescription;
+                 progData.code = student.progCode;
+
+                 sql = @"select id from [Students].[StudentProgramData] where code=@code and establishmentId=@establishmentId";
+                 try
+                 {
+                     int id = (int)connectionFactory.ExecuteWithId(DB.UCosmic, sql, progData, System.Data.CommandType.Text);
+                     record.programId = id;
+                 }
+                 catch (System.InvalidOperationException e)
+                 {
+                     
+                     sql = @"insert into [Students].[StudentProgramData] (code,name,isStandard,establishmentId) VALUES(@code, @name, @isStandard, @establishmentId)" +
+                           @"SELECT CAST(SCOPE_IDENTITY() as int)";
+                     record.programId = (int)connectionFactory.ExecuteWithId(DB.UCosmic, sql, progData, System.Data.CommandType.Text);
+
+                 }
+
 
                  record.studentId = student.externalId;
                  record.status = student.status;
+                 
 
-                 sql = @"insert into [Students].[StudentMobility]"+
+                 //Check if record exists
+                 sql = @"select TOP 1 id from [Students].[StudentMobility] where studentId=@studentId and termId=@termId";
+
+                 try
+                 {
+                     //Entry is a dupicate, do not add
+                     connectionFactory.ExecuteWithId(DB.UCosmic, sql, record, System.Data.CommandType.Text);
+                     fail += 1;
+
+                 }
+                 catch(System.InvalidOperationException e)
+                 {
+                     //If the entry does not exist, add it
+                     sql = @"insert into [Students].[StudentMobility]" +
                      @"VALUES(@studentId, @status, @levelId, @termId, @placeId, @programId, @establishmentId, @foreignEstablishmentId)";
-                 connectionFactory.Execute(DB.UCosmic, sql, record, System.Data.CommandType.Text);
+                     connectionFactory.Execute(DB.UCosmic, sql, record, System.Data.CommandType.Text);
+                     success += 1;
+                 }
 
-                
-
-
-
-                
-
-                
-                /*
-                //TODO: Do I need to check if affiliation exists?
-                string sql = @"insert into Students.AffiliationsData (@studentId, @localEstablishmentId)";
-                connectionFactory.ExecuteWithId(DB.UCosmic, sql, s)
-
-
-                string sql = @"insert into [studentActivity] (externalId, status, level,
-                                    termDescription, termEnd, termStart, countryCode, ucosmicOfficialName,
-                                    ucosmicCode, uCosmicForeignOfficialName, ucosmicForeignCode, progCode, progDescription) 
-                                    VALUES( @externalId, @status, @level, @termDescription, @termEnd, @termStart, @countryCode, @ucosmicOfficialName,
-                                    @ucosmicCode,@ucosmicForeignOfficialName, @ucosmicForeignCode,@progCode, @progDescription)";/*student.externalId.ToString() + "," + student.status + "," +
-                                    student.level + "," + student.termDescription + "," + student.termEnd.ToString() +
-                                    "," + student.termStart.ToString() + "," + student.countryCode + "," +
-                                    student.ucosmicOfficialName + "," + student.ucosmicCode + "," + student.ucosmicForeignCode +
-                                    "," + student.progCode + "," + student.progDescription + ");";*/
-               // connectionFactory.Execute(DB.UCosmic, sql, student, System.Data.CommandType.Text);
+                 
 
             }
 
+            return new int[] { success, fail };
         }
+
+        public int getTermId(StudentImportApi student, SqlConnectionFactory connectionFactory)
+        {
+            string sql = @"select id from [Students].[TermData] where name=@termDescription and startDate=@termStart and endDate=@termEnd";
+
+            try
+            {
+                int id = (int)connectionFactory.ExecuteWithId(DB.UCosmic, sql, student, System.Data.CommandType.Text);
+                return id;
+            }
+            catch (System.InvalidOperationException e)
+            {
+                //ID did not exist
+                sql = @"insert into [Students].[TermData] VALUES(@termDescription, @termStart, @termEnd)" +
+                      @"SELECT CAST(SCOPE_IDENTITY() as int)";
+                return (int)connectionFactory.ExecuteWithId(DB.UCosmic, sql, student, System.Data.CommandType.Text);
+            }
+        }
+
+        
     }
 }
