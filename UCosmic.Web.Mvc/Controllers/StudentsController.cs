@@ -17,11 +17,15 @@ namespace UCosmic.Web.Mvc.Controllers
 {
     public partial class StudentsController : Controller{
 
+        private StudentQueryParameters param = new StudentQueryParameters();
+
         [GET("/students/")]
         public virtual ActionResult Index()
         {
             StudentActivityRepository students = new StudentActivityRepository();
-            IList<StudentActivity> content = students.getStudentActivities();
+            param.order = "TermStart";
+            param.orderDirection = "ASC";
+            IList<StudentActivity> content = students.getStudentActivities(param);
 
             return View(content);
         }
@@ -54,12 +58,42 @@ namespace UCosmic.Web.Mvc.Controllers
         }
 
         [CurrentModuleTab(ModuleTab.Students)]
-        [GET("{domain}/students/table")]
-        public virtual ActionResult Table(string domain, ActivitySearchInputModel input)
+        [GET("{domain}/students/table/")]
+        public virtual ActionResult Table(string domain, ActivitySearchInputModel input, int? page, int?pageSize, string orderby, string orderDirection)
         {
             StudentActivityRepository students = new StudentActivityRepository();
-            IList<StudentActivity> content = students.getStudentActivities();
-            return View(content);
+            param.order = (orderby!=null) ? orderby:"TermStart";
+            param.orderDirection = (orderDirection!=null) ? orderDirection:"ASC";
+            param.page = (page != null) ? (int)page : 1;
+            param.pageSize = (pageSize != null) ? (int)pageSize : 10;
+
+            IList<StudentActivity> content = students.getStudentActivities(param);
+            ViewBag.Count = students.getStudentActivityCount(param);
+
+            ViewBag.Page = param.page;
+            ViewBag.PageSize = param.pageSize;
+            ViewBag.PageStart = ((param.page - 1) * param.pageSize) + 1;
+            ViewBag.PageEnd = param.page * param.pageSize;
+
+
+
+            int r = (ViewBag.Count % param.pageSize) > 0 ? 1 : 0;
+            ViewBag.LastPage = (ViewBag.Count / param.pageSize) + r;
+             
+            return View("Table", "_Layout2", content);
+        }
+
+        [GET("/api/students/")]
+        public JsonResult getTableJson(string domain, ActivitySearchInputModel input, int? page, int? pageSize, string orderby, string orderDirection)
+        {
+            StudentActivityRepository students = new StudentActivityRepository();
+            param.order = (orderby != null) ? orderby : "TermStart";
+            param.orderDirection = (orderDirection != null) ? orderDirection : "ASC";
+            param.page = (page != null) ? (int)page : 1;
+            param.pageSize = (pageSize != null) ? (int)pageSize : 10;
+            IList<StudentActivity> content = students.getStudentActivities(param);
+            StudentPager s = new StudentPager(content,param.page,param.pageSize,students.getStudentActivityCount(param), param.order,param.orderDirection);
+            return Json(s, JsonRequestBehavior.AllowGet);
         }
 
         [CurrentModuleTab(ModuleTab.Students)]

@@ -14,5 +14,14 @@
 
         <input type="submit" />
     </form>
+    <hr />
+
+    <div>
+        @if (ViewBag.Success != null)
+        {
+            <h2>@ViewBag.Success entries added successfully</h2>
+            <h2>@ViewBag.Failure entries were duplicates or had errors</h2>
+        }
+    </div>
 
 </div>

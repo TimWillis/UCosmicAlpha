@@ -24,6 +24,47 @@ namespace UCosmic.Web.Mvc.Models
         public string ucosmicForeignCode {get; set;}
     }
 
+    public class StudentJSONApi
+    {
+        public IList<StudentActivity> students {get;set;}
+        public StudentPager pager { get; set; }
+    }
+
+    public class StudentPager
+    {
+        public int page { get; set; }
+        public int pageSize { get; set; }
+        public int pageMax { get; set; }
+        public int pageStart { get; set; }
+        public int pageEnd { get; set; }
+        public int numStudents { get; set; }
+        public string order { get; set; }
+        public string orderDirection { get; set; }
+        public IList<StudentActivity> students { get; set; }
+
+        public StudentPager( IList<StudentActivity> students, int page, int pageSize, int numStudents, string order, string orderDirection)
+        {
+            this.page = page;
+            this.pageSize = pageSize;
+
+            //Calculate pageMax
+            this.pageMax = numStudents / pageSize;
+            int r = (numStudents % pageSize) > 1 ? 1 : 0;
+            this.pageMax += r;
+
+            this.pageStart = ((page - 1) * pageSize) + 1;
+            this.pageEnd = page * pageSize;
+            this.pageEnd = (this.pageEnd < numStudents) ? this.pageEnd : numStudents;
+
+            this.numStudents = numStudents;
+
+            this.order = order;
+            this.orderDirection = orderDirection;
+
+            this.students = students;
+        }
+    }
+
    
 
 }

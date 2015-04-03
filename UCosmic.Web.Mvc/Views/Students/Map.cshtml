@@ -1,0 +1,487 @@
+﻿@using System.Globalization
+@using UCosmic.Web.Mvc.Models
+
+@model ActivitySearchMapModel
+
+@{
+    ViewBag.Title = "Search Activities";
+}
+
+
+
+@section bib
+{
+    <nav class="bib">
+        @Html.Partial(MVC.Employees.Views._Bib, new EmployeesBibNavModel { Activities = true })
+    </nav>
+}
+
+
+
+@section styles
+{
+    <link href="~/styles/sass/sheets/employees/activities-table.css" rel="stylesheet" />
+    <style>
+        .inactive {
+            color: gray;
+        }
+    </style>
+}
+
+
+
+@section scripts
+{
+    <script src="~/scripts/oss/linq.js"></script>
+    @*<script src="~/scripts/app/Pager.js"></script>*@
+    <script src="~/scripts/app/Spinner.js"></script>
+    <script>
+        @{ Html.RenderPartial(MVC.JavaScriptRoutes.Views.Places); }
+        @{ Html.RenderPartial(MVC.JavaScriptRoutes.Views.Establishments); }
+    </script>
+
+    @Scripts.Render("~/bundles/activities/map")
+
+    <script>
+
+        ko.bindingHandlers.stopBinding = {
+            init: function () {
+                return { controlsDescendantBindings: true };
+            }
+        };
+
+        ko.virtualElements.allowedBindings.stopBinding = true;
+        var settings = {
+            input: $.parseJSON('@Html.Raw(Html.SerializeObject(Model.Input))'),
+            output: $.parseJSON('@Html.Raw(Html.SerializeObject(Model))'),
+            activityTypes: $.parseJSON('@Html.Raw(Html.SerializeObject(Model.ActivityTypes))'),
+            tenantId: parseInt('@ViewBag.EmployeesEstablishmentId'),
+            ancestorId: parseInt('@ViewBag.AncestorId'),
+        };
+        var viewModel = new Activities.ViewModels.MapSearch(settings, $.parseJSON('@Html.Raw(Html.SerializeObject(Model))'));
+        viewModel.applyBindings(document.getElementById('activity_search_form'));
+        @*var searchMap = new Activities.ViewModels.SearchMap($.parseJSON('@Html.Raw(Html.SerializeObject(Model))'));
+        searchMap.applyBindings(document.getElementById('searchMap'));*@
+        //var test = new Activities.ViewModels.SearchMap(settings.output);
+    </script>
+}
+
+
+
+<div class="content fixed to-top" data-current-module="employees">
+    <form class="group" method="GET" id="activity_search_form" data-bind="jQuery: '$form', submit: _submitForm">
+        <div class="on-left from-top">
+            @* HEADING & PIVOT RADIOS *@
+            <div class="group" style="height:30px;">
+                <div class="on-left">
+                    <header style=" margin-bottom:0px;">
+                        <h1>
+                            Advanced Search for Activities
+                        </h1>
+                    </header>
+                </div>
+                <div class="on-right" style="margin-top: 8px;">
+                    <a data-bind="click: resetSearch" class="restore-underline">Reset filters</a>
+                </div>
+            </div>
+
+            @* KEYWORD TEXT BOX *@
+            <table style="border: none; border-collapse: collapse; width: 100%;">
+                <tr>
+                    <td style="width: 95%;">
+                        <div class="field" style="margin-bottom: 0;">
+                            <input type="search" value="@Model.Input.Keyword" placeholder="Narrow all displayed activities by keyword" name="keyword"
+                                   data-bind="event: { search: onKeywordInputSearchEvent }, value: keyword" />
+                        </div>
+                    </td>
+                    <td style="text-align: right;">
+                        <div class="field" style="margin-bottom: 0; margin-left: 12px;">
+                            <input type="submit" value="Search" title="Click here or press the enter key to search." style="margin-right: 0;" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+
+            @* PAGER STATUS *@
+            <div style="height: 24px; margin-top: 8px; display: none;" data-bind="visible: loadingSpinner.isVisible">
+
+                <span style="margin-left: 12px;">
+                    <img src="~/images/icons/spinner/spinner-20-blue.gif" alt="" />
+                    <strong>Loading...</strong>
+                </span>
+            </div>
+
+            @* TOTALS SUMMARY *@
+            <div style="margin: 16px 0 0 0; height: 30px; font-size: 20px;">
+                Showing
+                <strong data-bind="text: searchMap.activityCount" style="font-size: 24px;">?</strong>
+                <span data-bind="visible: searchMap.activityCount() == 1" style="display: none;">activity</span>
+                <span data-bind="visible: searchMap.activityCount() != 1">activities</span>
+                in
+                <strong data-bind="text: searchMap.locationCount" style="font-size: 24px;">?</strong>
+                <span data-bind="visible: searchMap.locationCount() == 1" style="display: none;">location.</span>
+                <span data-bind="visible: searchMap.locationCount() != 1">locations.</span>
+            </div>
+
+            @*<div style="height: 24px; margin: 8px 0 0 0;">
+                    <strong>
+                        Showing <span data-bind="text: searchMap.activityCount">?</span> activities.
+                    </strong>
+                </div>*@
+            @* MAP LENS CONTEXTUAL TOTALS SUMMARY *@
+            <div style="position:relative; top:0px; height: 0px; z-index: 1;">
+                <div style="
+                    background-color: white;
+                    padding: 2px;
+                    border: solid 2px gray;
+                    display: none;
+                    border-radius: 5px;
+                    color: black;"
+                     data-bind="visible: infoIsOpen">
+                    <div style="height:24px; padding: 4px 8px 0">
+                        <div style="float:left;"><strong>Map Information</strong></div>
+                        <div style="float:right; background-color:gray; padding:2px; border-radius:2px; cursor:pointer;" data-bind="click: infoClose">X</div>
+                    </div>
+                    <div style="padding: 4px 8px;">
+                        The map displays faculty and staff activity information tagged to international location sites.
+                        The default map view displays all USF System activities aggregated at the continental and oceanic levels.
+                        Refining a search, by keyword or a selected filter, displays a more nuanced view of activities organized by continent, region, country and/or body of water, in addition to a general “global” category.
+                        Activity location site circles are color coded according to the key below.
+                        A single activity may be tagged in more than one location, although the preferred identification is by individual country or body of water.
+                        Mouse clicking on a colored circle will display a filtered table of the individual activities referenced on the map.
+                        Refining a search from the table view will also change the activities displayed on the map.
+                    </div>
+                </div>
+            </div>
+            <table style="border: none; border-collapse: collapse; width: 100%;" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td style="width: 95%;">
+                        <div style="line-height: 28px;">
+                            Numbers displayed represent known activity location sites.
+                        </div>
+                    </td>
+                    <td style="text-align: right;">
+                        <div class="field" style="margin: 0;">
+                            <input data-bind="click: infoOpen" type="button" value="Map Information" title="Click here for map information." style="margin-right: 0;" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <!-- ko stopBinding: true -->
+            <div id="searchMap" style="margin: 0 0 8px 0;">
+
+                @*<div style="color:gray; font-size:.8em;" data-bind="visible: regionCount().length > 0, text: regionCount">
+
+                    </div>*@
+                <div data-bind="visible: continentCode() != 'any' || countryCode() != 'any'" style="line-height: 16px;">
+                    @*<strong data-bind="text: status.count">?</strong>
+                        <span data-bind="visible: status.count() == 1" style="display: none;">activity</span>
+                        <span data-bind="visible: status.count() != 1">activities</span>*@
+
+                    <span style="display: inline-block; background-color: #ddd; padding: 4px 8px; border-radius: 4px; border: solid 1px #999;">
+                        <strong data-bind="text: continentName" style="">?</strong>
+                        <img src="~/images/icons/closer/closer-16-dark.png" title="Remove this search filter" alt="Remove this search filter"
+                             style="cursor: pointer; vertical-align: middle;" data-bind="click: clearFilter" />
+                    </span>
+                </div>
+            </div>
+
+            <div id="google_map_canvas" style="height: 500px; cursor: inherit;">
+            </div>
+            <!-- /ko -->
+            <div style="width: 100%;
+                    margin: 4px;
+                    color: black;">
+                <span style="height:24px; ">
+                    <div style="width:10px; background-color: #51524F; float:left;">&nbsp;</div>
+                    <div data-bind="css: { inactive: searchMap.placeFilter() == 'waters' }" style="float:left; margin: 0 16px 0 4px;">Continents</div>
+                </span>
+                <span style="height:24px;">
+                    <div style="width:10px; background-color: #5F6CFC; float:left;">&nbsp;</div>
+                    <div style="float:left; margin: 0 16px 0 4px;">Bodies of water</div>
+                </span>
+                <span style="height:24px;">
+                    <div style="width:10px; background-color: #5DC350; float:left;">&nbsp;</div>
+                    <div data-bind="css: { inactive: searchMap.placeFilter() == 'continents' || searchMap.placeFilter() == 'waters' }" style="float:left;margin: 0 16px 0 4px;">Countries</div>
+                </span>
+                <span style="height:24px;">
+                    <div style="width:10px; background-color: #F57169; float:left;">&nbsp;</div>
+                    <div data-bind="css: { inactive: searchMap.placeFilter() == 'continents' || searchMap.placeFilter() == 'waters' }" style="float:left; margin: 0 16px 0 4px;">Regions</div>
+                </span>
+                <span style="height:24px;">
+                    <div style="width:10px; background-color: #E9AE4F; float:left;">&nbsp;</div>
+                    <div data-bind="css: { inactive: searchMap.placeFilter() == 'waters' || searchMap.continentCode() != 'any' }" style="float:left; margin-left:4px;">Global</div>
+                </span>
+            </div>
+            @*<div style="position:relative; top:-40px;">
+                    <div style="width: 24px;
+                    background-color: white;
+                    float: right;
+                    padding: 2px;
+                    border: solid 2px gray;
+                    border-radius: 5px;
+                    color: black;
+                    cursor: pointer;"
+                         data-bind="click: keyOpen, visible: !keyIsOpen()">
+                        Key
+                    </div>
+                    <div style="width: 152px;
+                    background-color: white;
+                    float: right;
+                    padding: 2px;
+                    border: solid 2px gray;
+                    display: none;
+                    border-radius: 5px;
+                    color: black;
+                    position: relative;
+                    top: -124px;"
+                         data-bind="visible: keyIsOpen">
+                        <div style="height:24px;">
+                            <div style="float:left;">Key</div>
+                            <div style="float:right; background-color:gray; padding:2px; border-radius:2px; cursor:pointer;" data-bind="click: keyClose">X</div>
+                        </div>
+                        <div style="height:24px;">
+                            <div style="width:10px; background-color: #51524F; float:left;">&nbsp;</div>
+                            <div data-bind="css: { inactive: searchMap.placeFilter() == 'waters' }" style="float:left; margin-left:4px;">Continents</div>
+                        </div>
+                        <div style="height:24px;">
+                            <div style="width:10px; background-color: #5F6CFC; float:left;">&nbsp;</div>
+                            <div data-bind="css: { inactive: (searchMap.continentCode() != 'any' && searchMap.placeFilter() != 'waters') }" style="float:left; margin-left:4px;">Bodies of water</div>
+                        </div>
+                        <div style="height:24px;">
+                            <div style="width:10px; background-color: #5DC350; float:left;">&nbsp;</div>
+                            <div data-bind="css: { inactive: searchMap.placeFilter() == 'continents' || searchMap.placeFilter() == 'waters' }" style="float:left; margin-left:4px;">Countries</div>
+                        </div>
+                        <div style="height:24px;">
+                            <div style="width:10px; background-color: #F57169; float:left;">&nbsp;</div>
+                            <div data-bind="css: { inactive: searchMap.placeFilter() == 'continents' || searchMap.placeFilter() == 'waters' || searchMap.continentCode() != 'any' }" style="float:left; margin-left:4px;">Regions</div>
+                        </div>
+                        <div style="height:24px;">
+                            <div style="width:10px; background-color: #E9AE4F; float:left;">&nbsp;</div>
+                            <div data-bind="css: { inactive: searchMap.placeFilter() == 'continents' || searchMap.placeFilter() == 'waters' || searchMap.continentCode() != 'any' }" style="float:left; margin-left:4px;">Global</div>
+                        </div>
+                    </div>
+                </div>*@
+
+        </div>
+
+        <aside class="on-right from-top" data-fixed-scroll="root">
+            <div data-fixed-scroll="anchor"></div>
+            <div data-fixed-scroll="content">
+                <nav class="side">
+
+                    <ul class="top">
+                        <li class="static square-bottom" style="margin-bottom: 0;">
+                            <div class="group">
+                                <div class="on-left"></div>
+                            </div>
+                            <div class="group no-link" style="margin-left: 15px;">
+                                <span class="text">
+                                </span>
+                            </div>
+                        </li>
+                        <li class="static square-bottom">
+                            <div class="content">
+                                <div class="field">
+                                    <div>
+                                        <ul data-bind="foreach: affiliations()">
+                                            <li style="margin-bottom: 4px;display: none" data-bind="visible: $parent.hasEstablishmentSelects()">
+                                                <div>
+                                                    <select class="campusSelect" data-bind="options: options, value: value,
+                                                            optionsText: 'text', optionsValue: 'value', jQuery: '$select',
+                                                            attr: { id: 'campusSelect' + $index() }"
+                                                            style="padding: 1px; margin: initial; height: auto; width: 100%; font-size: 14px;">
+                                                        <option>[Loading...]</option>
+                                                    </select>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                        <span data-bind="visible: !hasEstablishmentSelects()">Loading...</span>
+                                        <input type="hidden" data-bind="value: selectedEstablishment" name="ancestorid" />
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="middle">
+                        <li class="static square-bottom " style="margin-bottom: 0;">
+                            <div class="group">
+                                <div class="on-left"></div>
+                            </div>
+                            <div class="group no-link">
+                                <span class="arrow"></span>
+                                <span class="text" style="border-radius: 0;">
+                                    Filter by location
+                                    <img src="~/images/icons/spinner/spinner-20-blue-on-ddd.gif" alt=""
+                                         style="margin-left: 4px; display: none;" data-bind="visible: loadingSpinner.isVisible" />
+                                </span>
+                            </div>
+                        </li>
+                        <li class="static square-bottom">
+                            <div class="content">
+                                @* LOCATION AUTOCOMPLETE *@
+                                <div class="location combobox field">
+                                    <input name="placeNames" type="text" placeholder="[Filter by location]" data-bind="jQuery: '$location', value: placeNames"
+                                           value="@(Model.Input.PlaceNames != null && Model.Input.PlaceNames.Any() ? Model.Input.PlaceNames.First() : "")"
+                                           class="side" />
+                                    <input name="placeIds" type="hidden" data-bind="jQuery: '$placeIds'"
+                                           value="@(Model.Input.PlaceIds != null && Model.Input.PlaceIds.Any() ? Model.Input.PlaceIds.First() : (int?)null)" />
+                                </div>
+                                @* CONTINENTS, WATERS, AND COUNTRIES *@
+                                @*<div class="location combobox field">*@
+                                <input name="placeFilter" type="hidden" data-bind="jQuery: '$placeFilter', value: placeFilter"
+                                       value=""
+                                       class="side" />
+                                @*<select data-bind=" data-bind=" jquery '$location' "" style="" class="">
+                                        <option value="Continents">Filter by continents</option>
+                                        <option value="Waters">Filter by bodies of water</option>
+                                        <option value="Countries">Filter by countries</option>
+                                    </select>*@
+                                @*<input name="placeNames" type="text" placeholder="[Filter by location]" data-bind="jQuery: '$location'"
+                                           value="@(Model.Input.PlaceNames != null && Model.Input.PlaceNames.Any() ? Model.Input.PlaceNames.First() : "")"
+                                           class="side" />
+                                    <input name="placeIds" type="hidden" data-bind="jQuery: '$placeIds'"
+                                           value="@(Model.Input.PlaceIds != null && Model.Input.PlaceIds.Any() ? Model.Input.PlaceIds.First() : (int?)null)" />*@
+                                @*</div>*@
+
+
+                                @* ACTIVITY TYPE CHECKBOXES *@
+                                @if (Model.ActivityTypes != null && Model.ActivityTypes.Any())
+                                {
+                                    <div class="field" style="margin-top: 12px;">
+                                        <strong>Filter by activity type</strong>
+                                        <ol style="color: #000; font-size: 13px; margin-top: 4px;">
+                                            @for (var i = 0; i < Model.ActivityTypes.Count(); i++)
+                                            {
+                                                var activityType = Model.ActivityTypes.ElementAt(i);
+                                                var isChecked = Model.Input.ActivityTypeIds == null ||
+                                                                !Model.Input.ActivityTypeIds.Any() ||
+                                                                Model.Input.ActivityTypeIds.Contains(activityType.ActivityTypeId)
+                                                    ? "checked" : null;
+                                                var checkBoxId = string.Format("activity_type_checkbox_{0}", Guid.NewGuid());
+                                                <li>
+                                                    <div class="group">
+                                                        <div class="on-left">
+                                                            <label style="cursor: pointer;" data-bind="with: activityTypeCheckBoxes()[@i]">
+                                                                <input type="checkbox" id="@checkBoxId"
+                                                                       name="activityTypeIds" value="@activityType.ActivityTypeId"
+                                                                       style="cursor: pointer;" data-bind="checked: isChecked" />
+                                                                <img title="@activityType.Text" width="14" alt="" style="margin-top: -6px; cursor: pointer;"
+                                                                     src="@Url.HttpRouteUrl(null, new { controller = "EmployeeModuleSettings", action = "GetIcon", typeId = activityType.ActivityTypeId })" />
+                                                            </label>
+                                                        </div>
+                                                        <div class="on-left" style="width: 180px; margin-left: 4px; margin-top: -2px;">
+                                                            <label style="cursor: pointer; vertical-align: top;" for="@checkBoxId">
+                                                                @activityType.Text
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ol>
+                                        <div style="margin-top: 4px;">
+                                            <input type="submit" value="Search"
+                                                   style="font-size: 14px; line-height: normal; padding: 4px 8px; margin-right: 4px;" />
+                                            @{ var checkAllDisabled = Model.Input.ActivityTypeIds == null || !Model.Input.ActivityTypeIds.Any()
+                                                                      || Model.Input.ActivityTypeIds.All(x => Model.ActivityTypes.Select(y => y.ActivityTypeId).Contains(x))
+                                                   ? "disabled" : null; }
+                                            <button type="button" class="link"
+                                                    data-bind="click: checkAllActivityTypes, disable: isCheckAllActivityTypesDisabled"
+                                                    style="font-size: 14px; line-height: normal; margin-right: 4px;" disabled="@checkAllDisabled">
+                                                Check all
+                                            </button>
+                                            <button type="button" class="link"
+                                                    data-bind="click: uncheckAllActivityTypes, disable: isUncheckAllActivityTypesDisabled"
+                                                    style="font-size: 14px; line-height: normal;">
+                                                Uncheck all
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+
+                                @* DATE FIELDS *@
+                                <div class="dates picker field" style="margin-top: 12px;">
+                                    <strong>Filter by date(s)</strong>
+                                    <div class="group">
+                                        <div class="on-left" style="width: 110px;">
+                                            <input type="text" name="Since" placeholder="From" class="side" value="@Model.Input.Since" data-role="datepicker"
+                                                   data-bind="value: since, valueUpdate: 'afterkeydown', jQuery: '$since'" />
+                                        </div>
+                                        <div class="on-right" style="width: 110px;">
+                                            <input type="text" name="Until" placeholder="To" class="side" value="@Model.Input.Until" data-role="datepicker"
+                                                   data-bind="value: until, valueUpdate: 'afterkeydown', jQuery: '$until'" />
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 12px; color: #555;">
+                                        YYYY or M/YYYY or M/D/YYYY
+                                    </div>
+                                    <div style="color: #000; font-size: 13px; line-height: 13px; margin-top: 4px;">
+                                        @{
+                                            var includeUndated = Model.Input.IncludeUndated == null ||
+                                                                 Model.Input.IncludeUndated.Value
+                                                ? "checked" : null;
+                                        }
+                                        <label style="cursor: pointer; vertical-align: top;">
+                                            <input type="checkbox" name="includeUndated" checked="@includeUndated" value="true" style="cursor: pointer;" data-bind="checked: includeUndated" /> Include undated activities
+                                            @*<input type="hidden" name="includeUndated" value="false" />*@
+                                        </label>
+                                    </div>
+                                    <div style="margin-top: 8px">
+                                        @{
+                                            var clearSinceDisabled = string.IsNullOrWhiteSpace(Model.Input.Since) ? "disabled" : null;
+                                            var clearUntilDisabled = string.IsNullOrWhiteSpace(Model.Input.Until) ? "disabled" : null;
+                                        }
+                                        <input type="submit" value="Search" style="font-size: 14px; line-height: normal; padding: 4px 8px; margin-right: 4px;" />
+                                        <button type="button" class="link"
+                                                data-bind="click: clearSince, disable: isClearSinceDisabled"
+                                                disabled="@clearSinceDisabled"
+                                                style="font-size: 14px; line-height: normal; margin-right: 4px;">
+                                            Clear from
+                                        </button>
+                                        <button type="button" class="link"
+                                                data-bind="click: clearUntil, disable: isClearUntilDisabled"
+                                                disabled="@clearUntilDisabled"
+                                                style="font-size: 14px; line-height: normal;">
+                                            Clear to
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+
+
+
+                    <ul class="bottom">
+                        <li>
+                            <a href="@Url.Action(MVC.Students.TenantIndex(Model.Domain))" class="group">
+                                <span class="arrow"></span>
+                                <span class="text">Global Snapshot</span>
+                            </a>
+                        </li>
+                        <li>
+                            @{
+                                var mapUrl = Url.Action(MVC.Employees.Table());
+                                if (Request.QueryString != null && !string.IsNullOrWhiteSpace(Request.QueryString.ToString()))
+                                {
+                                    mapUrl = string.Format("{0}?{1}", mapUrl, Request.QueryString);
+                                }
+                            }
+                            <a href="@mapUrl" data-bind="attr: { href: tableUrl, title: 'Advanced Search (Table)' }" class=" group">
+                                <span class="arrow"></span>
+                                <span class="text">Advanced Search (Table)</span>
+                            </a>
+                        </li>
+                        <li class="current">
+                            <a class=" group">
+                                <span class="arrow"></span>
+                                <span class="text">Advanced Search (Map)</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+    </form>
+</div>
