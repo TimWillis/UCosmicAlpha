@@ -57,15 +57,40 @@ namespace UCosmic.Web.Mvc.Controllers
             return View();
         }
 
-        [CurrentModuleTab(ModuleTab.Students)]
+
         [GET("{domain}/students/table/")]
-        public virtual ActionResult Table(string domain, ActivitySearchInputModel input, int? page, int?pageSize, string orderby, string orderDirection)
+        public virtual ActionResult Table(string domain, ActivitySearchInputModel input, int? page, int? pageSize, string orderby, string orderDirection, string FCountry, int? dateStart, int? dateEnd, string FContinent, string FDegree, string FLevel, string FInstitution)
         {
             StudentActivityRepository students = new StudentActivityRepository();
             param.order = (orderby!=null) ? orderby:"TermStart";
             param.orderDirection = (orderDirection!=null) ? orderDirection:"ASC";
             param.page = (page != null) ? (int)page : 1;
             param.pageSize = (pageSize != null) ? (int)pageSize : 10;
+            param.FCountry = FCountry;
+            param.FContinent = FContinent;
+            param.FDegree = FDegree;
+            param.FLevel = FLevel;
+            param.FInstitution = FInstitution;
+
+            if (dateStart == null)
+            { //If date not set
+                dateStart = 19000101; //January 1st, 1900 (show activities after 1900)
+            }
+            int yearStart = (int)dateStart / 10000;
+            int monthStart = (((int)dateStart - (10000 * yearStart)) / 100);
+            int dayStart = ((int)dateStart - (10000 * yearStart) - (100 * monthStart));
+            DateTime FStartDate = new DateTime(yearStart, monthStart, dayStart);
+            param.FStartDate = FStartDate;
+
+            if (dateEnd == null)
+            { //If date not set
+                dateEnd = 99990101; //January 1st, 9999 (show activities before 9999)
+            }
+            int yearEnd = (int)dateEnd / 10000;
+            int monthEnd = (((int)dateEnd - (10000 * yearEnd)) / 100);
+            int dayEnd = ((int)dateEnd - (10000 * yearEnd) - (100 * monthEnd));
+            DateTime FEndDate = new DateTime(yearEnd, monthEnd, dayEnd);
+            param.FEndDate = FEndDate;
 
             IList<StudentActivity> content = students.getStudentActivities(param);
             ViewBag.Count = students.getStudentActivityCount(param);
@@ -84,19 +109,45 @@ namespace UCosmic.Web.Mvc.Controllers
         }
 
         [GET("/api/students/")]
-        public JsonResult getTableJson(string domain, ActivitySearchInputModel input, int? page, int? pageSize, string orderby, string orderDirection)
+        public virtual JsonResult getTableJson(string domain, ActivitySearchInputModel input, int? page, int? pageSize, string orderby, string orderDirection, string FCountry, int? dateStart, int? dateEnd, string FContinent, string FDegree, string FLevel, string FInstitution)
         {
             StudentActivityRepository students = new StudentActivityRepository();
             param.order = (orderby != null) ? orderby : "TermStart";
             param.orderDirection = (orderDirection != null) ? orderDirection : "ASC";
             param.page = (page != null) ? (int)page : 1;
             param.pageSize = (pageSize != null) ? (int)pageSize : 10;
+            param.FCountry = FCountry;
+            param.FContinent = FContinent;
+            param.FDegree = FDegree;
+            param.FLevel = FLevel;
+            param.FInstitution = FInstitution;
+
+
+            if (dateStart == null) { //If date not set
+            dateStart = 19000101; //January 1st, 1900 (show activities after 1900)
+            }
+            int yearStart = (int)dateStart / 10000;
+            int monthStart = (((int)dateStart - (10000 * yearStart)) / 100);
+            int dayStart = ((int)dateStart - (10000 * yearStart) - (100 * monthStart));
+            DateTime FStartDate = new DateTime(yearStart, monthStart, dayStart);
+            param.FStartDate = FStartDate;
+
+            if (dateEnd == null)
+            { //If date not set
+                dateEnd = 99990101; //January 1st, 9999 (show activities before 9999)
+            }
+            int yearEnd = (int)dateEnd / 10000;
+            int monthEnd = (((int)dateEnd - (10000 * yearEnd)) / 100);
+            int dayEnd = ((int)dateEnd - (10000 * yearEnd) - (100 * monthEnd));
+            DateTime FEndDate = new DateTime(yearEnd, monthEnd, dayEnd);
+            param.FEndDate = FEndDate;
+
             IList<StudentActivity> content = students.getStudentActivities(param);
             StudentPager s = new StudentPager(content,param.page,param.pageSize,students.getStudentActivityCount(param), param.order,param.orderDirection);
             return Json(s, JsonRequestBehavior.AllowGet);
         }
 
-        [CurrentModuleTab(ModuleTab.Students)]
+        
         [GET("{domain}/students/map")]
         public virtual ActionResult Map(string domain, ActivitySearchInputModel input)
         {
@@ -105,7 +156,7 @@ namespace UCosmic.Web.Mvc.Controllers
             return View();
         }
 
-        [CurrentModuleTab(ModuleTab.Students)]
+        
         [GET("{domain}/students")]
         public virtual ActionResult TenantIndex(string domain)
         {

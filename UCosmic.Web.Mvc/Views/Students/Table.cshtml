@@ -272,6 +272,20 @@
 
                         },
 
+                        changeLevelBy: function (sel) {
+                            //Select orderby and direction for url parameters
+                            switch (sel.target.value) {
+                                case "UG":
+                                    this.urlParams.FLevel = "UG";
+                                    break;
+                                case "GR":
+                                    this.urlParams.FLevel = "GR";
+                                    break;
+                            }
+                            this.refresh();
+
+                        },
+
                         isSelected: function (sel) {
                             if (parseInt(sel.target.value) == this.pager.page) return true;
                             else return false; 
@@ -309,7 +323,15 @@
                             page: 1,
                             pageSize: 10,
                             orderby: "termStart",
-                            orderDirection: "DESC"
+                            orderDirection: "DESC",
+                            FCountry: "%%",
+                            dateStart: "19000101", //January 1st, 1900 by default (show activities after 1900)
+                            dateEnd: "99990101", //January 1st, 9999 by default (show activities before 9999)
+                            FContinent: "%%",
+                            FDegree: "%%",
+                            FLevel: "%%",
+                            FInstitution: "%%"
+                            //filter terms here
                         }
                     });
                 </script>
@@ -394,90 +416,90 @@ attr: { id: 'campusSelect' + $index() }"
                                 <input name="placeIds" type="hidden" data-bind="jQuery: '$placeIds'" />
                             </div>
 
-                            <div class="location combobox field">
-                                <input name="placeNames" type="text" placeholder="[Filter by level]" data-bind="jQuery: '$location'"
-                                       value=""
-                                       class="side" />
-                                <input name="placeIds" type="hidden" data-bind="jQuery: '$placeIds'" />
+                            <div class="field"
+                                 style=" margin: 10px 0 0 0;">
+                                <select name="levelby" class="side" id="levelby" on-change="{{changeLevelBy}}" data-sel="this">
+                                    <option selected="selected" value="%%">ALL</option>
+                                    <option value="GR">Graduate</option>
+                                    <option value="UG">Undergraduate</option>
+                                </select>
                             </div>
 
+            <div class="dates picker field" style="margin-top: 12px;">
+                <strong>Filter by date(s)</strong>
+                <div class="group">
+                    <div class="on-left" style="width: 110px;">
+                        <input type="text" name="Since" placeholder="From" class="side" data-role="datepicker"
+    data-bind="value: since, valueUpdate: 'afterkeydown', jQuery: '$since'" />
+</div>
+<div class="on-right" style="width: 110px;">
+    <input type="text" name="Until" placeholder="To" class="side" data-role="datepicker"
+    data-bind="value: until, valueUpdate: 'afterkeydown', jQuery: '$until'" />
+</div>
+</div>
+<div style="font-size: 12px; color: #555;">
+    YYYY or M/YYYY or M/D/YYYY
+</div>
+<div style="color: #000; font-size: 13px; line-height: 13px; margin-top: 4px;">
 
+    <label style="cursor: pointer; vertical-align: top;">
+        <input type="checkbox" name="includeUndated" checked="checked" value="true" style="cursor: pointer;" /> Include undated activities
+        <input type="hidden" name="includeUndated" value="false" />
+    </label>
+</div>
+<div style="margin-top: 8px">
 
-                            <div class="dates picker field" style="margin-top: 12px;">
-                                <strong>Filter by date(s)</strong>
-                                <div class="group">
-                                    <div class="on-left" style="width: 110px;">
-                                        <input type="text" name="Since" placeholder="From" class="side" data-role="datepicker"
-                                               data-bind="value: since, valueUpdate: 'afterkeydown', jQuery: '$since'" />
-                                    </div>
-                                    <div class="on-right" style="width: 110px;">
-                                        <input type="text" name="Until" placeholder="To" class="side" data-role="datepicker"
-                                               data-bind="value: until, valueUpdate: 'afterkeydown', jQuery: '$until'" />
-                                    </div>
-                                </div>
-                                <div style="font-size: 12px; color: #555;">
-                                    YYYY or M/YYYY or M/D/YYYY
-                                </div>
-                                <div style="color: #000; font-size: 13px; line-height: 13px; margin-top: 4px;">
-
-                                    <label style="cursor: pointer; vertical-align: top;">
-                                        <input type="checkbox" name="includeUndated" checked="checked" value="true" style="cursor: pointer;" /> Include undated activities
-                                        <input type="hidden" name="includeUndated" value="false" />
-                                    </label>
-                                </div>
-                                <div style="margin-top: 8px">
-
-                                    <input type="submit" value="Search" style="font-size: 14px; line-height: normal; padding: 4px 8px; margin-right: 4px;" />
-                                    <button type="button" class="link"
-                                            data-bind="click: clearSince, disable: isClearSinceDisabled"
-                                            disabled="disabled"
-                                            style="font-size: 14px; line-height: normal; margin-right: 4px;">
-                                        Clear from
-                                    </button>
-                                    <button type="button" class="link"
-                                            data-bind="click: clearUntil, disable: isClearUntilDisabled"
-                                            disabled="disabled"
-                                            style="font-size: 14px; line-height: normal;">
-                                        Clear to
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
+    <input type="submit" value="Search" style="font-size: 14px; line-height: normal; padding: 4px 8px; margin-right: 4px;" />
+    <button type="button" class="link"
+    data-bind="click: clearSince, disable: isClearSinceDisabled"
+    disabled="disabled"
+    style="font-size: 14px; line-height: normal; margin-right: 4px;">
+Clear from
+</button>
+<button type="button" class="link"
+    data-bind="click: clearUntil, disable: isClearUntilDisabled"
+    disabled="disabled"
+    style="font-size: 14px; line-height: normal;">
+Clear to
+</button>
+</div>
+</div>
+</div>
+</li>
+</ul>
 
 
 
-                <ul class="bottom">
-                    <li>
-                        <a href="/usf.edu/students/" class="group">
-                            <span class="arrow"></span>
-                            <span class="text">Global Snapshot</span>
-                        </a>
-                    </li>
-                    <li class="current">
-                        <a class="group">
-                            <span class="arrow"></span>
-                            <span class="text">Advanced Search (Table)</span>
-                        </a>
-                    </li>
-                    <li>
+<ul class="bottom">
+    <li>
+        <a href="/usf.edu/students/" class="group">
+            <span class="arrow"></span>
+            <span class="text">Global Snapshot</span>
+        </a>
+    </li>
+    <li class="current">
+        <a class="group">
+            <span class="arrow"></span>
+            <span class="text">Advanced Search (Table)</span>
+        </a>
+    </li>
+    <li>
 
-                        <a style=" display: none;" href="/usf.edu/students/map/" class="group" data-bind="visible: !MapDataIsLoading()">
-                            <span class="arrow"></span>
-                            <span class="text">Advanced Search (Map)</span>
-                        </a>
-                        <a class="group" style="cursor: not-allowed" data-bind="visible: MapDataIsLoading">
-                            <span class="arrow"></span>
-                            <span class="text">
-                                <img src="/images/icons/spinner/spinner-20-grey.gif" alt="" />
-                                <strong title="This can take a few minutes.">Loading Search (Map)...</strong>
-                            </span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </aside>
+        <a style=" display: none;" href="/usf.edu/students/map/" class="group" data-bind="visible: !MapDataIsLoading()">
+            <span class="arrow"></span>
+            <span class="text">Advanced Search (Map)</span>
+        </a>
+        <a class="group" style="cursor: not-allowed" data-bind="visible: MapDataIsLoading">
+            <span class="arrow"></span>
+            <span class="text">
+                <img src="/images/icons/spinner/spinner-20-grey.gif" alt="" />
+                <strong title="This can take a few minutes.">Loading Search (Map)...</strong>
+            </span>
+        </a>
+    </li>
+</ul>
+</nav>
+</div>
+</aside>
 </form>
 </div>
