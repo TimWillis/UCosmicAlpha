@@ -191,6 +191,24 @@
     <Compile Include="WorkerRole.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Scripts\Polymer\core-component-page\bowager-logo.png" />
+    <Content Include="Scripts\Polymer\core-component-page\core-component-page.html" />
+    <Content Include="Scripts\Polymer\core-component-page\demo.html" />
+    <Content Include="Scripts\Polymer\core-component-page\index.html" />
+    <Content Include="Scripts\Polymer\polymer\layout.html" />
+    <Content Include="Scripts\Polymer\polymer\polymer.html" />
+    <Content Include="Scripts\Polymer\polymer\polymer.js" />
+    <Content Include="Scripts\Polymer\polymer\polymer.min.js" />
+    <Content Include="Scripts\Polymer\webcomponentsjs\CustomElements.js" />
+    <Content Include="Scripts\Polymer\webcomponentsjs\CustomElements.min.js" />
+    <Content Include="Scripts\Polymer\webcomponentsjs\HTMLImports.js" />
+    <Content Include="Scripts\Polymer\webcomponentsjs\HTMLImports.min.js" />
+    <Content Include="Scripts\Polymer\webcomponentsjs\ShadowDOM.js" />
+    <Content Include="Scripts\Polymer\webcomponentsjs\ShadowDOM.min.js" />
+    <Content Include="Scripts\Polymer\webcomponentsjs\webcomponents-lite.js" />
+    <Content Include="Scripts\Polymer\webcomponentsjs\webcomponents-lite.min.js" />
+    <Content Include="Scripts\Polymer\webcomponentsjs\webcomponents.js" />
+    <Content Include="Scripts\Polymer\webcomponentsjs\webcomponents.min.js" />
     <None Include="Microsoft.WindowsAzure.Caching\ClientPerfCountersInstaller.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -220,6 +238,16 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <None Include="README.md" />
+    <None Include="Scripts\Polymer\core-component-page\bower.json" />
+    <None Include="Scripts\Polymer\core-component-page\README.md" />
+    <None Include="Scripts\Polymer\polymer\bower.json" />
+    <None Include="Scripts\Polymer\polymer\build.log" />
+    <None Include="Scripts\Polymer\polymer\README.md" />
+    <None Include="Scripts\Polymer\webcomponentsjs\bower.json" />
+    <None Include="Scripts\Polymer\webcomponentsjs\build.log" />
+    <None Include="Scripts\Polymer\webcomponentsjs\package.json" />
+    <None Include="Scripts\Polymer\webcomponentsjs\README.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UCosmic.Domain\UCosmic.Domain.csproj">

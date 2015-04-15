@@ -91,7 +91,10 @@
                     <a href="@Url.Action(MVC.Home.Alumni())">Alumni</a>
                 </li>*@
                 <li class="students">
-                    <a href="@Url.Action(MVC.Students.Index())">Students</a>
+                    @{
+                        var studentHref = Url.Action(hasStyleDomain ? MVC.Students.TenantIndex(styleDomain) : MVC.Students.Index());
+                    }
+                    <a href="@studentHref">Student Mobility</a>
                 </li>
                 @*<li class="reps">
                     <a href="@Url.Action(MVC.Home.Representatives())">Representatives</a>
@@ -142,6 +145,7 @@
         @RenderBody()
     </div>
     <footer>
+        <!---
         <div>
             <nav class="modules group">
                 <ul class="group on-left">
@@ -204,7 +208,7 @@
             @*<small class="powered-by">
                     <a href="http://www.github.com/ucosmic" target="_blank" title="Source code version @ViewBag.Version">Powered by UCosmic</a> | Copyright &copy; 2011-@DateTime.UtcNow.Year
                 </small>*@
-        </div>
+        </div>-->
     </footer>
     <input id="scroll_top_tracker" type="hidden" />
 

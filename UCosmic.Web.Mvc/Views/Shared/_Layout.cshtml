@@ -88,7 +88,10 @@
                     <a href="@Url.Action(MVC.Home.Alumni())">Alumni</a>
                 </li>*@
                 <li class="students">
-                    <a href="@Url.Action(MVC.Students.Index())">Students</a>
+                    @{
+                        var studentHref = Url.Action(hasStyleDomain ? MVC.Students.TenantIndex(styleDomain) : MVC.Students.Index());
+                    }
+                    <a href="@studentHref">Student Mobility</a>
                 </li>
                 @*<li class="reps">
                     <a href="@Url.Action(MVC.Home.Representatives())">Representatives</a>
@@ -164,8 +167,8 @@
                             </a>
                         </li>*@
                         <li class="students">
-                            <a href="@Url.Action(MVC.Students.Index())">
-                                Students
+                            <a href="@studentHref">
+                                Student Mobility
                             </a>
                         </li>
                         @*<li class="reps">

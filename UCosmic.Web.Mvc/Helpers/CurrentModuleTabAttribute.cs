@@ -21,5 +21,6 @@ namespace UCosmic.Web.Mvc
     {
         Employees,
         Admin,
+        Students
     }
 }

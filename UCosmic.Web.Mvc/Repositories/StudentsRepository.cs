@@ -19,13 +19,17 @@ namespace UCosmic.Repositories
         public string orderDirection { get; set; }
         public int pageSize { get; set; }
         public int page{get;set;}
+        public string institution { get; set; }
+        public string campus { get; set; }
+    }
 
+    public class InstitutionParam
+    {
+        public string institution { get; set; }
     }
 
     public class StudentActivityRepository
     {
-        
-
         private SqlConnectionFactory connectionFactory = new SqlConnectionFactory();
         private const string from_conditions = @" FROM [vw_MobilityDetail]";
         private const string paginated_from =
@@ -33,7 +37,8 @@ namespace UCosmic.Repositories
             rownum, * FROM vw_MobilityDetail)AS vw_MobilityDetail1";
 
         private const string paginated_where =
-            @" WHERE (rownum > ((@page-1)*@pageSize)) and (rownum <= (@page*@pageSize))";
+            @" WHERE (rownum > ((@page-1)*@pageSize)) and (rownum <= (@page*@pageSize))
+               AND campus like @campus";
         private const string order_conditions =
             @" order by 
                 CASE WHEN @orderDirection='ASC' THEN
@@ -254,5 +259,20 @@ namespace UCosmic.Repositories
                 //TODO: Don't fail silently.
             }
         }
+
+        public IList<StudentTermData> getTerms(string institution){
+            const string sql = @" SELECT [term] as name,[termStart] as startDate
+                                FROM [UCosmicTest].[dbo].[vw_MobilityDetail]
+                                where institution=@institution
+                                group by term,termStart
+                                order by termStart desc
+                                ";
+            InstitutionParam i = new InstitutionParam();
+            i.institution = institution;
+            return connectionFactory.SelectList<StudentTermData>(DB.UCosmic, sql, i);
+
+        }
+            
+            
     }
 }

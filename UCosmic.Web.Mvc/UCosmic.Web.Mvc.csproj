@@ -394,8 +394,10 @@
     <Compile Include="Models\Students\LoginData.cs" />
     <Compile Include="Models\Students\MobilityData.cs" />
     <Compile Include="Models\Students\ProgramData.cs" />
+    <Compile Include="Models\Students\StudentActivity.cs" />
     <Compile Include="Models\Students\StudentApi.cs" />
     <Compile Include="Models\Students\StudentData.cs" />
+    <Compile Include="Models\Students\StudentsBibNavModel.cs" />
     <Compile Include="Models\Students\TermData.cs" />
     <Compile Include="Models\Students\TermLinkData.cs" />
     <Compile Include="Models\Summary\ExpertiseSummaryApiModel.cs" />
@@ -3390,6 +3392,7 @@
     <None Include="Microsoft.WindowsAzure.Caching\ClientPerfCountersInstaller.exe.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="README.md" />
     <None Include="scripts\jquery\jquery-1.9.1.intellisense.js" />
     <Content Include="images\icons\user\male-and-female-256.png" />
     <Content Include="images\placeholders\ExpertiseMock.png" />
@@ -4246,6 +4249,24 @@
     <None Include="scripts\oss\linq-vsdoc.js" />
     <Content Include="scripts\oss\linq.js" />
     <Content Include="scripts\oss\linq.min.js" />
+    <Content Include="scripts\Polymer\core-component-page\bowager-logo.png" />
+    <Content Include="scripts\Polymer\core-component-page\core-component-page.html" />
+    <Content Include="scripts\Polymer\core-component-page\demo.html" />
+    <Content Include="scripts\Polymer\core-component-page\index.html" />
+    <Content Include="scripts\Polymer\polymer\layout.html" />
+    <Content Include="scripts\Polymer\polymer\polymer.html" />
+    <Content Include="scripts\Polymer\polymer\polymer.js" />
+    <Content Include="scripts\Polymer\polymer\polymer.min.js" />
+    <Content Include="scripts\Polymer\webcomponentsjs\CustomElements.js" />
+    <Content Include="scripts\Polymer\webcomponentsjs\CustomElements.min.js" />
+    <Content Include="scripts\Polymer\webcomponentsjs\HTMLImports.js" />
+    <Content Include="scripts\Polymer\webcomponentsjs\HTMLImports.min.js" />
+    <Content Include="scripts\Polymer\webcomponentsjs\ShadowDOM.js" />
+    <Content Include="scripts\Polymer\webcomponentsjs\ShadowDOM.min.js" />
+    <Content Include="scripts\Polymer\webcomponentsjs\webcomponents-lite.js" />
+    <Content Include="scripts\Polymer\webcomponentsjs\webcomponents-lite.min.js" />
+    <Content Include="scripts\Polymer\webcomponentsjs\webcomponents.js" />
+    <Content Include="scripts\Polymer\webcomponentsjs\webcomponents.min.js" />
     <Content Include="scripts\require\requireConfig_debug.js" />
     <Content Include="scripts\require\requireConfig.js" />
     <TypeScriptCompile Include="scripts\app\App.ts" />
@@ -4280,6 +4301,15 @@
     </Content>
     <TypeScriptCompile Include="scripts\typings\knockout.mapping\knockout.mapping.d.ts" />
     <TypeScriptCompile Include="scripts\typings\knockout.validation\knockout.validation.d.ts" />
+    <Content Include="scripts\Polymer\webcomponentsjs\README.md" />
+    <Content Include="scripts\Polymer\webcomponentsjs\package.json" />
+    <Content Include="scripts\Polymer\webcomponentsjs\build.log" />
+    <Content Include="scripts\Polymer\webcomponentsjs\bower.json" />
+    <Content Include="scripts\Polymer\polymer\README.md" />
+    <Content Include="scripts\Polymer\polymer\build.log" />
+    <Content Include="scripts\Polymer\polymer\bower.json" />
+    <Content Include="scripts\Polymer\core-component-page\README.md" />
+    <Content Include="scripts\Polymer\core-component-page\bower.json" />
     <None Include="scripts\typings\knockout\knockout.amd.d.ts" />
     <TypeScriptCompile Include="scripts\typings\knockout\knockout.d.ts" />
     <TypeScriptCompile Include="scripts\typings\modernizr\modernizr.d.ts" />
@@ -5263,6 +5293,10 @@
     <Content Include="Views\Students\Index.cshtml" />
     <Content Include="Views\Students\New.cshtml" />
     <Content Include="Views\Students\_FormFileAttachments.cshtml" />
+    <Content Include="Views\Students\_Bib.cshtml" />
+    <Content Include="Views\Students\TenantIndex.cshtml" />
+    <Content Include="Views\Students\Table.cshtml" />
+    <Content Include="Views\Students\Map.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

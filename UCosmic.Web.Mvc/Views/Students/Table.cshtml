@@ -21,6 +21,7 @@
 <link rel="import" href="~/components/Polymer/bower_components/core-ajax/core-ajax.html">
 
 
+
 <div class="content fixed to-top" data-current-module="students">
     <form class="group" method="GET" id="activity_search_form" data-bind="jQuery: '$form'">
         <div class="on-left from-top">
@@ -39,7 +40,7 @@
                 </div>
             </div>
 
-            <polymer-element name="activity-table" attributes="pager resp url table-headers">
+            <polymer-element name="activity-table" attributes="pager resp url table-headers domain">
                 <template>
                     <style>
                         table {
@@ -170,11 +171,12 @@
                             <tr>
                                 <th>Term</th>
                                 <th>Status</th>
+                                <th class="institution">Institution</th>
                                 <th>Country</th>
                                 <th>Level</th>
                                 <th>Degree Program</th>
-                                <th>Feeder Institution</th>
-                                <th>Host Institution</th>
+                                <th class="feeder">Feeder Institution</th>
+                                <th class="host">Host Institution</th>
                             </tr>
                         </thead>
 
@@ -183,11 +185,12 @@
                                 <tr>
                                     <td>{{student.term}}</td>
                                     <td>{{student.status}}</td>
+                                    <td class="institution">{{student.institution}}</td>
                                     <td>{{student.country}}</td>
                                     <td>{{student.level}}</td>
                                     <td>{{student.program}}</td>
-                                    <td>{{student.localEstablishmentName}}</td>
-                                    <td>{{student.foreignEstablishmentName}}</td>                                       
+                                    <td class="feeder">{{student.localEstablishmentName}}</td>
+                                    <td class="host">{{student.foreignEstablishmentName}}</td>                                       
                                 </tr>
                             </template>
                         </tbody>
@@ -218,6 +221,15 @@
 
                         changePageSize: function (sel) {
                             this.urlParams.pageSize = parseInt(sel.target.value);
+                            this.refresh();
+                        },
+
+                        filterByCampus: function(sel){
+                            if(sel.value=='All Campuses'){
+                                this.urlParams.campus = "%%"
+                            }else{
+                                this.urlParams.campus = sel.value;
+                            }
                             this.refresh();
                         },
                         
@@ -299,6 +311,9 @@
                             this.pager = JSON.parse(response.detail.response);
                             this.pageRange = this.range(1, this.pager.pageMax);
 
+                            //determine which columns to display based off feeder/host
+                            this.hideInstitutionOrHost();
+
                             //disable buttons on first/last page
                             this.$.prev_button.disabled = (this.pager.page == 1) ? true : false;
                             this.$.next_button.disabled = (this.pager.page == this.pager.pageMax) ? true : false;
@@ -306,10 +321,28 @@
 
                         urlParams: {
                             domain: "",
+                            campus: "%%",
                             page: 1,
                             pageSize: 10,
                             orderby: "termStart",
                             orderDirection: "DESC"
+                        },
+
+                        hideInstitutionOrHost: function () {
+                            //If feeder or host is empty, only display institution
+                            if(this.pager.numStudents>0){
+                                if(this.pager.students[0].localEstablishmentName=='' || 
+                                    this.pager.students[0].foreignEstablishmentName == '') {
+                                    $(this.shadowRoot.querySelectorAll(".feeder")).hide()
+                                    $(this.shadowRoot.querySelectorAll(".host")).hide()
+                                    $(this.shadowRoot.querySelectorAll(".institution")).show()
+                                   
+                                } else {
+                                    $(this.shadowRoot.querySelectorAll(".feeder")).show()
+                                    $(this.shadowRoot.querySelectorAll(".host")).show()
+                                    $(this.shadowRoot.querySelectorAll(".institution")).hide()
+                                }
+                            }
                         }
                     });
                 </script>
@@ -337,19 +370,15 @@
                         <div class="content">
                             <div class="field">
                                 <div>
-                                    <ul data-bind="foreach: affiliations()">
-                                        <li style="margin-bottom: 4px;display: none" data-bind="visible: $parent.hasEstablishmentSelects()">
-                                            <div>
-                                                <select class="campusSelect" data-bind="options: options, value: value,
-optionsText: 'text', optionsValue: 'value', jQuery: '$select',
-attr: { id: 'campusSelect' + $index() }"
-                                                        style="padding: 1px; margin: initial; height: auto; width: 100%; font-size: 14px;">
-                                                    <option>[Loading...]</option>
-                                                </select>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                    <span data-bind="visible: !hasEstablishmentSelects()">Loading...</span>
+                                    <select class="campusSelect" style="padding: 1px; margin: initial; height: auto; width: 100%; font-size: 14px;" onchange="document.querySelector('#activity-table').filterByCampus(this)">
+                                        <option>All Campuses</option>
+                                        @{foreach (var o in ViewBag.campus)
+                                          {
+                                              <option>@o.OfficialName</option>
+                                          }     
+                                         }
+                                    </select>
+                                    
                                     <input type="hidden" data-bind="value: selectedEstablishment" name="ancestorid" />
                                 </div>
                             </div>

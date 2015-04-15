@@ -19,6 +19,13 @@ namespace UCosmic.Web.Mvc.Controllers
 
         private StudentQueryParameters param = new StudentQueryParameters();
 
+        private readonly IProcessQueries _queryProcessor;
+
+        public StudentsController(IProcessQueries queryProcessor)
+        {
+            _queryProcessor = queryProcessor;
+        }
+
         [GET("/students/")]
         public virtual ActionResult Index()
         {
@@ -61,36 +68,45 @@ namespace UCosmic.Web.Mvc.Controllers
         [GET("{domain}/students/table/")]
         public virtual ActionResult Table(string domain, ActivitySearchInputModel input, int? page, int?pageSize, string orderby, string orderDirection)
         {
-            StudentActivityRepository students = new StudentActivityRepository();
-            param.order = (orderby!=null) ? orderby:"TermStart";
-            param.orderDirection = (orderDirection!=null) ? orderDirection:"ASC";
-            param.page = (page != null) ? (int)page : 1;
-            param.pageSize = (pageSize != null) ? (int)pageSize : 10;
+            //load filter parameter values
+            Establishment establishment = null;
+            StudentActivityRepository student_rep = new StudentActivityRepository();
 
-            IList<StudentActivity> content = students.getStudentActivities(param);
-            ViewBag.Count = students.getStudentActivityCount(param);
+            var tenancy = Request.Tenancy() ?? new Tenancy();
+            if (tenancy.TenantId.HasValue)
+                {
+                    establishment = _queryProcessor.Execute(new EstablishmentById(tenancy.TenantId.Value));
+                }
+                else if (!String.IsNullOrEmpty(tenancy.StyleDomain) && !"default".Equals(tenancy.StyleDomain))
+                {
+                    establishment = _queryProcessor.Execute(new EstablishmentByEmail(tenancy.StyleDomain));
+                }
 
-            ViewBag.Page = param.page;
-            ViewBag.PageSize = param.pageSize;
-            ViewBag.PageStart = ((param.page - 1) * param.pageSize) + 1;
-            ViewBag.PageEnd = param.page * param.pageSize;
-
-
-
-            int r = (ViewBag.Count % param.pageSize) > 0 ? 1 : 0;
-            ViewBag.LastPage = (ViewBag.Count / param.pageSize) + r;
-             
-            return View("Table", "_Layout2", content);
+            if (establishment != null)
+            {
+                ICollection<Establishment> campus = establishment.Children; // list o
+                
+                IList<StudentTermData> terms = student_rep.getTerms(establishment.OfficialName);
+                ViewBag.campus = campus;
+                ViewBag.terms = terms;
+                return View("Table", "_Layout2");
+            }
+            else
+            {
+                return HttpNotFound();
+            }
+            
         }
 
         [GET("/api/students/")]
-        public JsonResult getTableJson(string domain, ActivitySearchInputModel input, int? page, int? pageSize, string orderby, string orderDirection)
+        public virtual JsonResult getTableJson(string domain, string campus, ActivitySearchInputModel input, int? page, int? pageSize, string orderby, string orderDirection)
         {
             StudentActivityRepository students = new StudentActivityRepository();
             param.order = (orderby != null) ? orderby : "TermStart";
             param.orderDirection = (orderDirection != null) ? orderDirection : "ASC";
             param.page = (page != null) ? (int)page : 1;
             param.pageSize = (pageSize != null) ? (int)pageSize : 10;
+            param.campus = (campus != null) ? campus : "%%";
             IList<StudentActivity> content = students.getStudentActivities(param);
             StudentPager s = new StudentPager(content,param.page,param.pageSize,students.getStudentActivityCount(param), param.order,param.orderDirection);
             return Json(s, JsonRequestBehavior.AllowGet);
