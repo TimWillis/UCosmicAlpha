@@ -21,6 +21,13 @@ namespace UCosmic.Repositories
         public int page{get;set;}
         public string institution { get; set; }
         public string campus { get; set; }
+        public DateTime FStartDate { get; set; }
+        public DateTime FEndDate { get; set; }
+        public string FCountry { get; set; }
+        public string FContinent { get; set; }
+        public string FDegree { get; set; }
+        public string FLevel { get; set; }
+        public string FInstitution { get; set; }
     }
 
     public class InstitutionParam
@@ -30,15 +37,17 @@ namespace UCosmic.Repositories
 
     public class StudentActivityRepository
     {
+        public string StatusOUT = "OUT";
         private SqlConnectionFactory connectionFactory = new SqlConnectionFactory();
         private const string from_conditions = @" FROM [vw_MobilityDetail]";
         private const string paginated_from =
             @" FROM (SELECT ROW_NUMBER() OVER(" + order_conditions + @") AS
             rownum, * FROM vw_MobilityDetail)AS vw_MobilityDetail1";
-
+        //
         private const string paginated_where =
-            @" WHERE (rownum > ((@page-1)*@pageSize)) and (rownum <= (@page*@pageSize))
-               AND campus like @campus";
+            @" WHERE (rownum > ((@page-1)*@pageSize)) and (rownum <= (@page*@pageSize)) and termStart >= @FStartDate and termStart <= @FEndDate and campus like @campus and
+  Country like @FCountry and continent like @FContinent and program like @FDegree and level like @FLevel and (  ((status = 'IN') and localEstablishmentName like @FInstitution) OR ((status = 'OUT') and foreignEstablishmentName like @FInstitution)  ) ";
+
         private const string order_conditions =
             @" order by 
                 CASE WHEN @orderDirection='ASC' THEN
