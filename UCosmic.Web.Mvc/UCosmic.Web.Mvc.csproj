@@ -634,6 +634,7 @@
     <Compile Include="Repositories\EmployeeActivityTypeRepository.cs" />
     <Compile Include="Repositories\ActivityMapCounts.cs" />
     <Compile Include="Repositories\ActivitySnapshotRepository.cs" />
+    <Compile Include="Repositories\PlacesRepository.cs" />
     <Compile Include="Repositories\StudentsRepository.cs" />
     <Compile Include="Repositories\SummaryRepository.cs" />
     <Compile Include="RepsController.generated.cs">

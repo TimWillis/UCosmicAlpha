@@ -28,11 +28,7 @@ namespace UCosmic.Repositories
         public string FDegree { get; set; }
         public string FLevel { get; set; }
         public string FInstitution { get; set; }
-    }
-
-    public class InstitutionParam
-    {
-        public string institution { get; set; }
+        public string FStatus { get; set; }
     }
 
     public class StudentActivityRepository
@@ -41,12 +37,14 @@ namespace UCosmic.Repositories
         private SqlConnectionFactory connectionFactory = new SqlConnectionFactory();
         private const string from_conditions = @" FROM [vw_MobilityDetail]";
         private const string paginated_from =
-            @" FROM (SELECT ROW_NUMBER() OVER(" + order_conditions + @") AS
-            rownum, * FROM vw_MobilityDetail)AS vw_MobilityDetail1";
+            @" FROM (SELECT ROW_NUMBER() OVER( " + order_conditions + @") AS
+            rownum, * FROM vw_MobilityDetail WHERE " + filter_conditions +" )AS vw_MobilityDetail1 ";
         //
+
+        private const string filter_conditions = @" status like @FStatus and termStart >= @FStartDate and termStart <= @FEndDate and campus like @campus and
+  Country like @FCountry and continent like @FContinent and program like @FDegree and level like @FLevel and (  ((status = 'IN') and localEstablishmentName like @FInstitution) OR ((status = 'OUT') and foreignEstablishmentName like @FInstitution) ) ";
         private const string paginated_where =
-            @" WHERE (rownum > ((@page-1)*@pageSize)) and (rownum <= (@page*@pageSize)) and termStart >= @FStartDate and termStart <= @FEndDate and campus like @campus and
-  Country like @FCountry and continent like @FContinent and program like @FDegree and level like @FLevel and (  ((status = 'IN') and localEstablishmentName like @FInstitution) OR ((status = 'OUT') and foreignEstablishmentName like @FInstitution)  ) ";
+            @" WHERE (rownum > ((@page-1)*@pageSize)) and (rownum <= (@page*@pageSize)) and termStart >= @FStartDate and " + filter_conditions;
 
         private const string order_conditions =
             @" order by 
@@ -95,7 +93,7 @@ namespace UCosmic.Repositories
 
         public int getStudentActivityCount(StudentQueryParameters param)
         {
-            const string sql = @"select COUNT(*)" + from_conditions;
+            const string sql = @"select COUNT(*)" + from_conditions + " WHERE " + filter_conditions;
             return connectionFactory.SelectList<int>(DB.UCosmic, sql, param)[0];
         }
 
@@ -268,6 +266,19 @@ namespace UCosmic.Repositories
                 //TODO: Don't fail silently.
             }
         }
+       
+        public IList<StudentProgramData> getPrograms(string institution)
+        {
+            const string sql = @" SELECT program as name, code
+                                    FROM [UCosmicTest].[dbo].[vw_MobilityDetail]
+                                    where institution=@institution
+                                    group by program,code
+                                ";
+            StudentQueryParameters param = new StudentQueryParameters();
+            param.institution = institution;
+            return connectionFactory.SelectList<StudentProgramData>(DB.UCosmic, sql, param);
+
+        }
 
         public IList<StudentTermData> getTerms(string institution){
             const string sql = @" SELECT [term] as name,[termStart] as startDate
@@ -276,9 +287,9 @@ namespace UCosmic.Repositories
                                 group by term,termStart
                                 order by termStart desc
                                 ";
-            InstitutionParam i = new InstitutionParam();
-            i.institution = institution;
-            return connectionFactory.SelectList<StudentTermData>(DB.UCosmic, sql, i);
+            StudentQueryParameters param = new StudentQueryParameters();
+            param.institution = institution;
+            return connectionFactory.SelectList<StudentTermData>(DB.UCosmic, sql, param);
 
         }
             

@@ -25,9 +25,6 @@ namespace UCosmic.Web.Mvc.Controllers
     public partial class StudentsController
     {
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
-        public StudentsController() { }
-
-        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
         protected StudentsController(Dummy d) { }
 
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
@@ -44,6 +41,30 @@ namespace UCosmic.Web.Mvc.Controllers
             return RedirectToRoutePermanent(callInfo.RouteValueDictionary);
         }
 
+        [NonAction]
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public System.Web.Mvc.ActionResult Table()
+        {
+            return new T4MVC_System_Web_Mvc_ActionResult(Area, Name, ActionNames.Table);
+        }
+        [NonAction]
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public System.Web.Mvc.JsonResult getTableJson()
+        {
+            return new T4MVC_System_Web_Mvc_JsonResult(Area, Name, ActionNames.getTableJson);
+        }
+        [NonAction]
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public System.Web.Mvc.ActionResult Map()
+        {
+            return new T4MVC_System_Web_Mvc_ActionResult(Area, Name, ActionNames.Map);
+        }
+        [NonAction]
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public System.Web.Mvc.ActionResult TenantIndex()
+        {
+            return new T4MVC_System_Web_Mvc_ActionResult(Area, Name, ActionNames.TenantIndex);
+        }
 
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
         public StudentsController Actions { get { return MVC.Students; } }
@@ -62,6 +83,10 @@ namespace UCosmic.Web.Mvc.Controllers
         {
             public readonly string Index = "Index";
             public readonly string New = "New";
+            public readonly string Table = "Table";
+            public readonly string getTableJson = "getTableJson";
+            public readonly string Map = "Map";
+            public readonly string TenantIndex = "TenantIndex";
         }
 
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
@@ -69,9 +94,66 @@ namespace UCosmic.Web.Mvc.Controllers
         {
             public const string Index = "Index";
             public const string New = "New";
+            public const string Table = "Table";
+            public const string getTableJson = "getTableJson";
+            public const string Map = "Map";
+            public const string TenantIndex = "TenantIndex";
         }
 
 
+        static readonly ActionParamsClass_New s_params_New = new ActionParamsClass_New();
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public ActionParamsClass_New NewParams { get { return s_params_New; } }
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public class ActionParamsClass_New
+        {
+            public readonly string file = "file";
+        }
+        static readonly ActionParamsClass_Table s_params_Table = new ActionParamsClass_Table();
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public ActionParamsClass_Table TableParams { get { return s_params_Table; } }
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public class ActionParamsClass_Table
+        {
+            public readonly string domain = "domain";
+            public readonly string input = "input";
+            public readonly string page = "page";
+            public readonly string pageSize = "pageSize";
+            public readonly string orderby = "orderby";
+            public readonly string orderDirection = "orderDirection";
+            public readonly string FCountry = "FCountry";
+            public readonly string dateStart = "dateStart";
+            public readonly string dateEnd = "dateEnd";
+            public readonly string FContinent = "FContinent";
+            public readonly string FDegree = "FDegree";
+            public readonly string FLevel = "FLevel";
+            public readonly string FInstitution = "FInstitution";
+        }
+        static readonly ActionParamsClass_getTableJson s_params_getTableJson = new ActionParamsClass_getTableJson();
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public ActionParamsClass_getTableJson getTableJsonParams { get { return s_params_getTableJson; } }
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public class ActionParamsClass_getTableJson
+        {
+            public readonly string param = "param";
+        }
+        static readonly ActionParamsClass_Map s_params_Map = new ActionParamsClass_Map();
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public ActionParamsClass_Map MapParams { get { return s_params_Map; } }
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public class ActionParamsClass_Map
+        {
+            public readonly string domain = "domain";
+            public readonly string input = "input";
+        }
+        static readonly ActionParamsClass_TenantIndex s_params_TenantIndex = new ActionParamsClass_TenantIndex();
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public ActionParamsClass_TenantIndex TenantIndexParams { get { return s_params_TenantIndex; } }
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public class ActionParamsClass_TenantIndex
+        {
+            public readonly string domain = "domain";
+        }
         static readonly ViewsClass s_views = new ViewsClass();
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
         public ViewsClass Views { get { return s_views; } }
@@ -82,13 +164,21 @@ namespace UCosmic.Web.Mvc.Controllers
             public _ViewNamesClass ViewNames { get { return s_ViewNames; } }
             public class _ViewNamesClass
             {
+                public readonly string _Bib = "_Bib";
                 public readonly string _FormFileAttachments = "_FormFileAttachments";
                 public readonly string Index = "Index";
+                public readonly string Map = "Map";
                 public readonly string New = "New";
+                public readonly string Table = "Table";
+                public readonly string TenantIndex = "TenantIndex";
             }
+            public readonly string _Bib = "~/Views/Students/_Bib.cshtml";
             public readonly string _FormFileAttachments = "~/Views/Students/_FormFileAttachments.cshtml";
             public readonly string Index = "~/Views/Students/Index.cshtml";
+            public readonly string Map = "~/Views/Students/Map.cshtml";
             public readonly string New = "~/Views/Students/New.cshtml";
+            public readonly string Table = "~/Views/Students/Table.cshtml";
+            public readonly string TenantIndex = "~/Views/Students/TenantIndex.cshtml";
         }
     }
 
@@ -106,6 +196,54 @@ namespace UCosmic.Web.Mvc.Controllers
         public override System.Web.Mvc.ActionResult New()
         {
             var callInfo = new T4MVC_System_Web_Mvc_ActionResult(Area, Name, ActionNames.New);
+            return callInfo;
+        }
+
+        public override System.Web.Mvc.ActionResult New(System.Web.HttpPostedFileBase file)
+        {
+            var callInfo = new T4MVC_System_Web_Mvc_ActionResult(Area, Name, ActionNames.New);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "file", file);
+            return callInfo;
+        }
+
+        public override System.Web.Mvc.ActionResult Table(string domain, UCosmic.Web.Mvc.Models.ActivitySearchInputModel input, int? page, int? pageSize, string orderby, string orderDirection, string FCountry, int? dateStart, int? dateEnd, string FContinent, string FDegree, string FLevel, string FInstitution)
+        {
+            var callInfo = new T4MVC_System_Web_Mvc_ActionResult(Area, Name, ActionNames.Table);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "domain", domain);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "input", input);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "page", page);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "pageSize", pageSize);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "orderby", orderby);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "orderDirection", orderDirection);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "FCountry", FCountry);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "dateStart", dateStart);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "dateEnd", dateEnd);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "FContinent", FContinent);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "FDegree", FDegree);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "FLevel", FLevel);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "FInstitution", FInstitution);
+            return callInfo;
+        }
+
+        public override System.Web.Mvc.JsonResult getTableJson(UCosmic.Repositories.StudentQueryParameters param)
+        {
+            var callInfo = new T4MVC_System_Web_Mvc_JsonResult(Area, Name, ActionNames.getTableJson);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "param", param);
+            return callInfo;
+        }
+
+        public override System.Web.Mvc.ActionResult Map(string domain, UCosmic.Web.Mvc.Models.ActivitySearchInputModel input)
+        {
+            var callInfo = new T4MVC_System_Web_Mvc_ActionResult(Area, Name, ActionNames.Map);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "domain", domain);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "input", input);
+            return callInfo;
+        }
+
+        public override System.Web.Mvc.ActionResult TenantIndex(string domain)
+        {
+            var callInfo = new T4MVC_System_Web_Mvc_ActionResult(Area, Name, ActionNames.TenantIndex);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "domain", domain);
             return callInfo;
         }
 

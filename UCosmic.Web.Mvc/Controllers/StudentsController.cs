@@ -71,6 +71,7 @@ namespace UCosmic.Web.Mvc.Controllers
             //load filter parameter values
             Establishment establishment = null;
             StudentActivityRepository student_rep = new StudentActivityRepository();
+            PlacesRepository places_rep = new PlacesRepository();
 
             var tenancy = Request.Tenancy() ?? new Tenancy();
             if (tenancy.TenantId.HasValue)
@@ -84,11 +85,13 @@ namespace UCosmic.Web.Mvc.Controllers
 
             if (establishment != null)
             {
-                ICollection<Establishment> campus = establishment.Children; // list o
+                //Load filter parameters
+                ViewBag.campus = establishment.Children; // list of campuses
+                ViewBag.continents = places_rep.getContinentList();
+                ViewBag.countries = places_rep.getCountryList();
+                ViewBag.programs = student_rep.getPrograms(establishment.OfficialName);
+                ViewBag.terms = student_rep.getTerms(establishment.OfficialName);
                 
-                IList<StudentTermData> terms = student_rep.getTerms(establishment.OfficialName);
-                ViewBag.campus = campus;
-                ViewBag.terms = terms;
                 return View("Table", "_Layout2");
             }
             else
@@ -97,43 +100,21 @@ namespace UCosmic.Web.Mvc.Controllers
             }   
         }
 
+
+
         [GET("/api/students/")]
-        public virtual JsonResult getTableJson(string domain, string campus, ActivitySearchInputModel input, int? page, int? pageSize, string orderby, string orderDirection, string FCountry, int? dateStart, int? dateEnd, string FContinent, string FDegree, string FLevel, string FInstitution)
+        public virtual JsonResult getTableJson(StudentQueryParameters param)
         {
-            StudentActivityRepository students = new StudentActivityRepository();
-            param.order = (orderby != null) ? orderby : "TermStart";
-            param.orderDirection = (orderDirection != null) ? orderDirection : "ASC";
-            param.page = (page != null) ? (int)page : 1;
-            param.pageSize = (pageSize != null) ? (int)pageSize : 10;
-            param.campus = (campus != null) ? campus : "%%";
-            param.FCountry = (FCountry!=null)? FCountry : "%%";
-            param.FContinent = FContinent;
-            param.FDegree = FDegree;
-            param.FLevel = FLevel;
-            param.FInstitution = FInstitution;
-
-
-            if (dateStart == null) { //If date not set
-            dateStart = 19000101; //January 1st, 1900 (show activities after 1900)
-            }
-            int yearStart = (int)dateStart / 10000;
-            int monthStart = (((int)dateStart - (10000 * yearStart)) / 100);
-            int dayStart = ((int)dateStart - (10000 * yearStart) - (100 * monthStart));
-            DateTime FStartDate = new DateTime(yearStart, monthStart, dayStart);
-            param.FStartDate = FStartDate;
-
-            if (dateEnd == null)
-            { //If date not set
-                dateEnd = 99990101; //January 1st, 9999 (show activities before 9999)
-            }
-            int yearEnd = (int)dateEnd / 10000;
-            int monthEnd = (((int)dateEnd - (10000 * yearEnd)) / 100);
-            int dayEnd = ((int)dateEnd - (10000 * yearEnd) - (100 * monthEnd));
-            DateTime FEndDate = new DateTime(yearEnd, monthEnd, dayEnd);
-            param.FEndDate = FEndDate;
-
+            StudentActivityRepository students = new StudentActivityRepository();    
             IList<StudentActivity> content = students.getStudentActivities(param);
-            StudentPager s = new StudentPager(content,param.page,param.pageSize,students.getStudentActivityCount(param), param.order,param.orderDirection);
+            bool tracksForeign=false;
+            if (content.Count > 0)
+            {
+                //if either local or foreign establishment name is null, the institution does not track foreign universities
+                tracksForeign = ((content.FirstOrDefault().localEstablishmentName == null) || 
+                                 (content.FirstOrDefault().foreignEstablishmentName == null)) ? false : true;
+            }
+            StudentPager s = new StudentPager(content,param.page,param.pageSize,students.getStudentActivityCount(param), param.order,param.orderDirection, tracksForeign);
             return Json(s, JsonRequestBehavior.AllowGet);
         }
 

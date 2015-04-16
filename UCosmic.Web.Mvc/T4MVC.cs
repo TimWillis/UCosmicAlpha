@@ -115,6 +115,19 @@ public class T4MVC_System_Web_Mvc_ViewResult : System.Web.Mvc.ViewResult, IT4MVC
     public RouteValueDictionary RouteValueDictionary { get; set; }
 }
 [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+public class T4MVC_System_Web_Mvc_JsonResult : System.Web.Mvc.JsonResult, IT4MVCActionResult
+{
+    public T4MVC_System_Web_Mvc_JsonResult(string area, string controller, string action, string protocol = null): base()
+    {
+        this.InitMVCT4Result(area, controller, action, protocol);
+    }
+    
+    public string Controller { get; set; }
+    public string Action { get; set; }
+    public string Protocol { get; set; }
+    public RouteValueDictionary RouteValueDictionary { get; set; }
+}
+[GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
 public class T4MVC_System_Web_Mvc_RedirectResult : System.Web.Mvc.RedirectResult, IT4MVCActionResult
 {
     public T4MVC_System_Web_Mvc_RedirectResult(string area, string controller, string action, string protocol = null): base(" ", default(bool))
@@ -1470,6 +1483,67 @@ namespace Links
             public static readonly string moment_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/moment.min.js") ? Url("moment.min.js") : Url("moment.js");
                           
             public static readonly string moment_min_js = Url("moment.min.js");
+        }
+    
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public static class Polymer {
+            private const string URLPATH = "~/scripts/Polymer";
+            public static string Url() { return T4MVCHelpers.ProcessVirtualPath(URLPATH); }
+            public static string Url(string fileName) { return T4MVCHelpers.ProcessVirtualPath(URLPATH + "/" + fileName); }
+            [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+            public static class core_component_page {
+                private const string URLPATH = "~/scripts/Polymer/core-component-page";
+                public static string Url() { return T4MVCHelpers.ProcessVirtualPath(URLPATH); }
+                public static string Url(string fileName) { return T4MVCHelpers.ProcessVirtualPath(URLPATH + "/" + fileName); }
+                public static readonly string bowager_logo_png = Url("bowager-logo.png");
+                public static readonly string bower_json = Url("bower.json");
+                public static readonly string core_component_page_html = Url("core-component-page.html");
+                public static readonly string demo_html = Url("demo.html");
+                public static readonly string index_html = Url("index.html");
+                public static readonly string README_md = Url("README.md");
+            }
+        
+            [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+            public static class polymer {
+                private const string URLPATH = "~/scripts/Polymer/polymer";
+                public static string Url() { return T4MVCHelpers.ProcessVirtualPath(URLPATH); }
+                public static string Url(string fileName) { return T4MVCHelpers.ProcessVirtualPath(URLPATH + "/" + fileName); }
+                public static readonly string bower_json = Url("bower.json");
+                public static readonly string build_log = Url("build.log");
+                public static readonly string layout_html = Url("layout.html");
+                public static readonly string polymer_html = Url("polymer.html");
+                public static readonly string polymer_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/polymer.min.js") ? Url("polymer.min.js") : Url("polymer.js");
+                              
+                public static readonly string polymer_min_js = Url("polymer.min.js");
+                public static readonly string README_md = Url("README.md");
+            }
+        
+            [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+            public static class webcomponentsjs {
+                private const string URLPATH = "~/scripts/Polymer/webcomponentsjs";
+                public static string Url() { return T4MVCHelpers.ProcessVirtualPath(URLPATH); }
+                public static string Url(string fileName) { return T4MVCHelpers.ProcessVirtualPath(URLPATH + "/" + fileName); }
+                public static readonly string bower_json = Url("bower.json");
+                public static readonly string build_log = Url("build.log");
+                public static readonly string CustomElements_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/CustomElements.min.js") ? Url("CustomElements.min.js") : Url("CustomElements.js");
+                              
+                public static readonly string CustomElements_min_js = Url("CustomElements.min.js");
+                public static readonly string HTMLImports_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/HTMLImports.min.js") ? Url("HTMLImports.min.js") : Url("HTMLImports.js");
+                              
+                public static readonly string HTMLImports_min_js = Url("HTMLImports.min.js");
+                public static readonly string package_json = Url("package.json");
+                public static readonly string README_md = Url("README.md");
+                public static readonly string ShadowDOM_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/ShadowDOM.min.js") ? Url("ShadowDOM.min.js") : Url("ShadowDOM.js");
+                              
+                public static readonly string ShadowDOM_min_js = Url("ShadowDOM.min.js");
+                public static readonly string webcomponents_lite_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/webcomponents-lite.min.js") ? Url("webcomponents-lite.min.js") : Url("webcomponents-lite.js");
+                              
+                public static readonly string webcomponents_lite_min_js = Url("webcomponents-lite.min.js");
+                public static readonly string webcomponents_js = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/webcomponents.min.js") ? Url("webcomponents.min.js") : Url("webcomponents.js");
+                              
+                public static readonly string webcomponents_min_js = Url("webcomponents.min.js");
+            }
+        
         }
     
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]

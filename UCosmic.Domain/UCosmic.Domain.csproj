@@ -187,6 +187,7 @@
     <Compile Include="Domain\Places\Documents\PlaceDocument.cs" />
     <Compile Include="Domain\Places\Documents\PlaceDocumentIndexer.cs" />
     <Compile Include="Domain\Places\Queries\AutoCompletePlaceName.cs" />
+    <Compile Include="Domain\Students\Entities\StudentActivityValues.cs" />
     <Compile Include="Properties\ReSharperAnnotations.cs" />
     <Compile Include="Api\Commands\IHandleCommands.cs" />
     <Compile Include="Api\Data\IEagerLoad.cs" />

@@ -17,7 +17,7 @@
             }
         }
         <a href="@activitiesHref">Activities</a>
-    </li>
+    </li>    
     <li class="@(Model.FindAnExpert ? "current" : null)">
         <a href="@Url.Action(hasStyleDomain ? MVC.Employees.Experts(styleDomain) : MVC.Employees.Index())">Find an Expert</a>
     </li>

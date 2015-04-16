@@ -175,6 +175,7 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Data.Services.Client" />
     <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
@@ -214,6 +215,11 @@
     <Compile Include="Cqrs\MultipleDispatchEventTrigger.cs" />
     <Compile Include="Cqrs\RetryCommandDecorator.cs" />
     <Compile Include="Cqrs\RetryQueryDecorator.cs" />
+    <Compile Include="DataClasses1.designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataClasses1.dbml</DependentUpon>
+    </Compile>
     <Compile Include="EntityFramework\Fluent\HomeAlert.cs" />
     <Compile Include="EntityFramework\Fluent\HomeSections.cs" />
     <Compile Include="FluentValidation\ValidationProcessor.cs" />
@@ -222,6 +228,11 @@
     <Compile Include="Lucene\IisFileSystemDirectoryStore.cs" />
     <Compile Include="Lucene\RootComposer.cs" />
     <Compile Include="Lucene\SearcherManager.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="SeedData\PrivateSqlSeeder.cs" />
     <Compile Include="_Extensions\BinaryDataStorageExtensions.cs" />
     <Compile Include="BinaryData\IisFileSystemBinaryDataStorage.cs" />
@@ -361,11 +372,20 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="DataClasses1.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>DataClasses1.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Microsoft.WindowsAzure.Caching\ClientPerfCountersInstaller.exe.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="SeedData\SeedMediaFiles\14E5C461-2E5E-4E63-9701-DC3F009AB98E.mov" />
     <None Include="SeedData\SeedMediaFiles\322BF184-32C3-49CA-8C97-18ABE32CFD8A.mp3" />
@@ -393,6 +413,14 @@
     </None>
     <None Include="Microsoft.WindowsAzure.Caching\PerformanceCounters.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DataClasses1.dbml.layout">
+      <DependentUpon>DataClasses1.dbml</DependentUpon>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

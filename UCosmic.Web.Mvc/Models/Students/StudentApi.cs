@@ -41,15 +41,16 @@ namespace UCosmic.Web.Mvc.Models
         public string order { get; set; }
         public string orderDirection { get; set; }
         public IList<StudentActivity> students { get; set; }
+        public bool tracksForeign { get; set; }
 
-        public StudentPager( IList<StudentActivity> students, int page, int pageSize, int numStudents, string order, string orderDirection)
+        public StudentPager( IList<StudentActivity> students, int page, int pageSize, int numStudents, string order, string orderDirection, bool tracksForeign)
         {
             this.page = page;
             this.pageSize = pageSize;
 
             //Calculate pageMax
             this.pageMax = numStudents / pageSize;
-            int r = (numStudents % pageSize) > 1 ? 1 : 0;
+            int r = (numStudents % pageSize) >= 1 ? 1 : 0;
             this.pageMax += r;
 
             this.pageStart = ((page - 1) * pageSize) + 1;
@@ -62,6 +63,7 @@ namespace UCosmic.Web.Mvc.Models
             this.orderDirection = orderDirection;
 
             this.students = students;
+            this.tracksForeign = tracksForeign;
         }
     }
 
