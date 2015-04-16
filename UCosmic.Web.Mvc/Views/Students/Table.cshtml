@@ -132,7 +132,7 @@
                             <td align="right">
                                 <div class="field"
                                      style=" margin: 10px 0 0 0;">
-                                    <select name="orderBy" class="side" id="orderby" on-change="{{changeOrderBy}}" data-sel="this">
+                                    <select name="orderBy" class="side" id="orderBy" on-change="{{changeorderBy}}" data-sel="this">
                                         <option selected="selected" value="term-desc">Sort by term most recent at top</option>
                                         <option value="term-asc">Sort with term most recent at bottom</option>
                                         <option value="status-asc">Sort by status inbound at top</option>
@@ -162,13 +162,13 @@
                         </tr>
                     </table>
 
-                    <table class="data">     
+                    <table class="data" style="width:100%">     
                         <thead>
                             <tr>
                                 <th>Term</th>
                                 <th>Status</th>
                                 <template if="{{!pager.tracksForeign}}">
-                                    <th>Institution</th>
+                                    <th>Campus</th>
                                 </template>
                                 <th>Country</th>
                                 <th>Level</th>
@@ -186,7 +186,7 @@
                                     <td>{{student.term}}</td>
                                     <td>{{student.status}}</td>
                                     <template if="{{!pager.tracksForeign}}">
-                                        <td>{{student.institution}}</td>
+                                        <td>{{student.campus}}</td>
                                     </template>
                                     <td>{{student.country}}</td>
                                     <td>{{student.level}}</td>
@@ -275,48 +275,48 @@
                             this.refresh();
                         },
                         
-                        changeOrderBy: function (sel) {
-                            //Select orderby and direction for url parameters
+                        changeorderBy: function (sel) {
+                            //Select orderBy and direction for url parameters
                             switch(sel.target.value){
                                 case "term-desc"  : 
-                                    this.urlParams.orderby          = "termStart"; 
+                                    this.urlParams.orderBy          = "termStart"; 
                                     this.urlParams.orderDirection   = "DESC"; 
                                     break;
                                 case "term-asc"   :
-                                    this.urlParams.orderby          = "termStart"; 
+                                    this.urlParams.orderBy          = "termStart"; 
                                     this.urlParams.orderDirection   = "ASC"; 
                                     break;
                                 case "status-asc" :
-                                    this.urlParams.orderby          = "status"; 
+                                    this.urlParams.orderBy          = "status"; 
                                     this.urlParams.orderDirection   = "ASC"; 
                                     break;
                                 case "status-desc":
-                                    this.urlParams.orderby          = "status"; 
+                                    this.urlParams.orderBy          = "status"; 
                                     this.urlParams.orderDirection   = "DESC"; 
                                     break;
                                 case "country-asc":
-                                    this.urlParams.orderby          = "country"; 
+                                    this.urlParams.orderBy          = "country"; 
                                     this.urlParams.orderDirection   = "ASC"; 
                                     break;
                                 case "country-desc":
-                                    this.urlParams.orderby          = "country"; 
+                                    this.urlParams.orderBy          = "country"; 
                                     this.urlParams.orderDirection   = "DESC"; 
                                     break;
                                 case "level-desc":
                                     //rank is the numerical version of level
-                                    this.urlParams.orderby          = "rank";
+                                    this.urlParams.orderBy          = "rank";
                                     this.urlParams.orderDirection   = "DESC";
                                     break;
                                 case "level-asc":
-                                    this.urlParams.orderby          = "rank";
+                                    this.urlParams.orderBy          = "rank";
                                     this.urlParams.orderDirection   = "ASC";
                                     break;
                                 case "program-asc":
-                                    this.urlParams.orderby          = "program";
+                                    this.urlParams.orderBy          = "program";
                                     this.urlParams.orderDirection   = "ASC";
                                     break;
                                 case "program-desc":
-                                    this.urlParams.orderby          = "program";
+                                    this.urlParams.orderBy          = "program";
                                     this.urlParams.orderDirection   = "DESC";
                                     break;
 
@@ -327,7 +327,7 @@
                         },
 
                         changeLevelBy: function (sel) {
-                            //Select orderby and direction for url parameters
+                            //Select orderBy and direction for url parameters
                             switch (sel.target.value) {
                                 case "UG":
                                     this.urlParams.FLevel = "UG";
@@ -378,7 +378,7 @@
                             campus: "%%",
                             page: 1,
                             pageSize: 10,
-                            orderby: "termStart",
+                            orderBy: "termStart",
                             orderDirection: "DESC",
                             FCountry: "%%",
                             FStartDate: "1/1/1753 12:00:00 AM", //January 1st, 1900 by default (show activities after 1900)

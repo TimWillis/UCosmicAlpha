@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="UCosmicTest" Class="DataClasses1DataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="AppSettings" ConnectionString="Data Source=LOCALHOST\SQLEXPRESS;Initial Catalog=UCosmicTest;Integrated Security=True;MultipleActiveResultSets=True" SettingsObjectName="UCosmic.Properties.Settings" SettingsPropertyName="UCosmicTestConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="Students.StudentMobility" Member="StudentMobilities">
+    <Type Name="StudentMobility">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="studentId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="status" Type="System.String" DbType="VarChar(3) NOT NULL" CanBeNull="false" />
+      <Column Name="levelId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="termId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="placeId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="programId" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="establishmentId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="foreignEstablishmentId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+</Database>
