@@ -30,7 +30,7 @@ namespace UCosmic.Web.Mvc.Controllers
         public virtual ActionResult Index()
         {
             StudentActivityRepository students = new StudentActivityRepository();
-            param.order = "TermStart";
+            param.orderBy = "TermStart";
             param.orderDirection = "ASC";
             IList<StudentActivity> content = students.getStudentActivities(param);
 
@@ -66,8 +66,9 @@ namespace UCosmic.Web.Mvc.Controllers
 
 
         [GET("{domain}/students/table/")]
-        public virtual ActionResult Table(string domain, ActivitySearchInputModel input, int? page, int? pageSize, string orderby, string orderDirection, string FCountry, int? dateStart, int? dateEnd, string FContinent, string FDegree, string FLevel, string FInstitution)
+        public virtual ActionResult Table(string domain)
         {
+
             //load filter parameter values
             Establishment establishment = null;
             StudentActivityRepository student_rep = new StudentActivityRepository();
@@ -105,6 +106,20 @@ namespace UCosmic.Web.Mvc.Controllers
         [GET("/api/students/")]
         public virtual JsonResult getTableJson(StudentQueryParameters param)
         {
+            Establishment establishment = null;
+
+            var tenancy = Request.Tenancy() ?? new Tenancy();
+            if (tenancy.TenantId.HasValue)
+            {
+                establishment = _queryProcessor.Execute(new EstablishmentById(tenancy.TenantId.Value));
+            }
+            else if (!String.IsNullOrEmpty(tenancy.StyleDomain) && !"default".Equals(tenancy.StyleDomain))
+            {
+                establishment = _queryProcessor.Execute(new EstablishmentByEmail(tenancy.StyleDomain));
+            }
+
+            param.FInstitution = establishment.OfficialName;
+
             StudentActivityRepository students = new StudentActivityRepository();    
             IList<StudentActivity> content = students.getStudentActivities(param);
             bool tracksForeign=false;
@@ -114,7 +129,7 @@ namespace UCosmic.Web.Mvc.Controllers
                 tracksForeign = ((content.FirstOrDefault().localEstablishmentName == null) || 
                                  (content.FirstOrDefault().foreignEstablishmentName == null)) ? false : true;
             }
-            StudentPager s = new StudentPager(content,param.page,param.pageSize,students.getStudentActivityCount(param), param.order,param.orderDirection, tracksForeign);
+            StudentPager s = new StudentPager(content,param.page,param.pageSize,students.getStudentActivityCount(param), param.orderBy,param.orderDirection, tracksForeign);
             return Json(s, JsonRequestBehavior.AllowGet);
         }
 

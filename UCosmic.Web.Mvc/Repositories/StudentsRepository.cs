@@ -15,7 +15,7 @@ namespace UCosmic.Repositories
 {
     public class StudentQueryParameters
     {
-        public string order { get;set; }
+        public string orderBy { get;set; }
         public string orderDirection { get; set; }
         public int pageSize { get; set; }
         public int page{get;set;}
@@ -41,44 +41,54 @@ namespace UCosmic.Repositories
             rownum, * FROM vw_MobilityDetail WHERE " + filter_conditions +" )AS vw_MobilityDetail1 ";
         //
 
-        private const string filter_conditions = @" status like @FStatus and termStart >= @FStartDate and termStart <= @FEndDate and campus like @campus and
-  Country like @FCountry and continent like @FContinent and program like @FDegree and level like @FLevel and (  ((status = 'IN') and localEstablishmentName like @FInstitution) OR ((status = 'OUT') and foreignEstablishmentName like @FInstitution) ) ";
+        private const string filter_conditions = @" status like @FStatus and 
+                                                    termStart >= @FStartDate and 
+                                                    termStart <= @FEndDate and 
+                                                    campus like @campus and
+                                                    Country like @FCountry and 
+                                                    continent like @FContinent and 
+                                                    program like @FDegree and 
+                                                    level like @FLevel and 
+                                                    institution like @FInstitution ";
         private const string paginated_where =
-            @" WHERE (rownum > ((@page-1)*@pageSize)) and (rownum <= (@page*@pageSize)) and termStart >= @FStartDate and " + filter_conditions;
+            @" WHERE 
+                (rownum > ((@page-1)*@pageSize)) and 
+                (rownum <= (@page*@pageSize)) and
+                termStart >= @FStartDate and " + filter_conditions;
 
         private const string order_conditions =
             @" order by 
                 CASE WHEN @orderDirection='ASC' THEN
-	                CASE @order  --string
+	                CASE @orderBy  --string
 	                WHEN 'Country' THEN Country 
                     WHEN 'status' THEN status
                     WHEN 'program' then program
 	                END 
                 END ASC,
                 CASE WHEN @orderDirection='ASC' THEN
-	                CASE @order --date
+	                CASE @orderBy --date
 	                WHEN 'TermStart' THEN TermStart 
 	                END
                 END ASC,
                 CASE WHEN @orderDirection='ASC' THEN
-	                CASE @order --int
+	                CASE @orderBy --int
 	                WHEN 'rank' THEN rank 
 	                END
                 END ASC,
                 CASE WHEN @orderDirection='DESC' THEN
-	                CASE @order --string
+	                CASE @orderBy --string
 	                WHEN 'Country' THEN Country
                     WHEN 'status' THEN status
                     WHEN 'program' then program 
 	                END 
                 END DESC,
                 CASE WHEN @orderDirection='DESC' THEN
-	                CASE @order --date
+	                CASE @orderBy --date
 	                WHEN 'TermStart' THEN TermStart 
 	                END
                 END DESC,
                 CASE WHEN @orderDirection='DESC' THEN
-	                CASE @order --int
+	                CASE @orderBy --int
 	                WHEN 'rank' THEN rank 
 	                END
                 END DESC
