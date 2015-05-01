@@ -3606,19 +3606,37 @@ namespace Links
             public static string Url() { return T4MVCHelpers.ProcessVirtualPath(URLPATH); }
             public static string Url(string fileName) { return T4MVCHelpers.ProcessVirtualPath(URLPATH + "/" + fileName); }
             public static readonly string _bootstrap_scss = Url("_bootstrap.scss");
+            public static readonly string _bootstrap_css = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/_bootstrap.min.css") ? Url("_bootstrap.min.css") : Url("_bootstrap.css");
+                 
             public static readonly string _future_scss = Url("_future.scss");
+            public static readonly string _future_css = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/_future.min.css") ? Url("_future.min.css") : Url("_future.css");
+                 
             [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
             public static class sheets {
                 private const string URLPATH = "~/styles/sass/sheets";
                 public static string Url() { return T4MVCHelpers.ProcessVirtualPath(URLPATH); }
                 public static string Url(string fileName) { return T4MVCHelpers.ProcessVirtualPath(URLPATH + "/" + fileName); }
                 public static readonly string _designs_scss = Url("_designs.scss");
+                public static readonly string _designs_css = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/_designs.min.css") ? Url("_designs.min.css") : Url("_designs.css");
+                     
                 public static readonly string _forms_scss = Url("_forms.scss");
+                public static readonly string _forms_css = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/_forms.min.css") ? Url("_forms.min.css") : Url("_forms.css");
+                     
                 public static readonly string _ie8_scss = Url("_ie8.scss");
+                public static readonly string _ie8_css = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/_ie8.min.css") ? Url("_ie8.min.css") : Url("_ie8.css");
+                     
                 public static readonly string _layout_banner_scss = Url("_layout-banner.scss");
+                public static readonly string _layout_banner_css = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/_layout-banner.min.css") ? Url("_layout-banner.min.css") : Url("_layout-banner.css");
+                     
                 public static readonly string _layout_content_scss = Url("_layout-content.scss");
+                public static readonly string _layout_content_css = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/_layout-content.min.css") ? Url("_layout-content.min.css") : Url("_layout-content.css");
+                     
                 public static readonly string _layout_footer_scss = Url("_layout-footer.scss");
+                public static readonly string _layout_footer_css = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/_layout-footer.min.css") ? Url("_layout-footer.min.css") : Url("_layout-footer.css");
+                     
                 public static readonly string _layout_scss = Url("_layout.scss");
+                public static readonly string _layout_css = T4MVCHelpers.IsProduction() && T4Extensions.FileExists(URLPATH + "/_layout.min.css") ? Url("_layout.min.css") : Url("_layout.css");
+                     
                 [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
                 public static class employees {
                     private const string URLPATH = "~/styles/sass/sheets/employees";

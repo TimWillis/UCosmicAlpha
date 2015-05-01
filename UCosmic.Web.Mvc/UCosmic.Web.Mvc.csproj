@@ -394,9 +394,12 @@
     <Compile Include="Models\Students\LoginData.cs" />
     <Compile Include="Models\Students\MobilityData.cs" />
     <Compile Include="Models\Students\ProgramData.cs" />
+    <Compile Include="Models\Students\CountryMobility.cs" />
+    <Compile Include="Models\Students\UploadInfo.cs" />
     <Compile Include="Models\Students\StudentActivity.cs" />
     <Compile Include="Models\Students\StudentApi.cs" />
     <Compile Include="Models\Students\StudentData.cs" />
+    <Compile Include="Models\Students\StudentDataFilters.cs" />
     <Compile Include="Models\Students\StudentsBibNavModel.cs" />
     <Compile Include="Models\Students\TermData.cs" />
     <Compile Include="Models\Students\TermLinkData.cs" />
@@ -4918,6 +4921,33 @@
     <Content Include="styles\sass\sheets\people\my-profile.css">
       <DependentUpon>my-profile.scss</DependentUpon>
     </Content>
+    <Content Include="styles\sass\sheets\_designs.css">
+      <DependentUpon>_designs.scss</DependentUpon>
+    </Content>
+    <Content Include="styles\sass\sheets\_forms.css">
+      <DependentUpon>_forms.scss</DependentUpon>
+    </Content>
+    <Content Include="styles\sass\sheets\_ie8.css">
+      <DependentUpon>_ie8.scss</DependentUpon>
+    </Content>
+    <Content Include="styles\sass\sheets\_layout-banner.css">
+      <DependentUpon>_layout-banner.scss</DependentUpon>
+    </Content>
+    <Content Include="styles\sass\sheets\_layout-content.css">
+      <DependentUpon>_layout-content.scss</DependentUpon>
+    </Content>
+    <Content Include="styles\sass\sheets\_layout-footer.css">
+      <DependentUpon>_layout-footer.scss</DependentUpon>
+    </Content>
+    <Content Include="styles\sass\sheets\_layout.css">
+      <DependentUpon>_layout.scss</DependentUpon>
+    </Content>
+    <Content Include="styles\sass\_bootstrap.css">
+      <DependentUpon>_bootstrap.scss</DependentUpon>
+    </Content>
+    <Content Include="styles\sass\_future.css">
+      <DependentUpon>_future.scss</DependentUpon>
+    </Content>
     <Content Include="styles\tenants\hpu.edu\logo.png" />
     <Content Include="styles\tenants\hpu.edu\banner-logo.png" />
     <Content Include="styles\tenants\hpu.edu\designs.css">
@@ -5175,10 +5205,12 @@
     <Content Include="Views\Shared\EditorTemplates\tinymce_full_compressed.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\tinymce_full.cshtml" />
     <None Include="styles\sass\sheets\_designs.scss">
-      <Compile>False</Compile>
+      <Compile>True</Compile>
       <Minify>True</Minify>
       <CompileStyle>Nested</CompileStyle>
       <DebugInfo>False</DebugInfo>
+      <IgnoreWarnings>False</IgnoreWarnings>
+      <IgnoreErrors>False</IgnoreErrors>
     </None>
     <None Include="styles\tenants\_default\designs.scss" />
     <None Include="styles\tenants\lehigh.edu\designs.scss" />
@@ -5315,7 +5347,14 @@
       <CompileStyle>Nested</CompileStyle>
       <DebugInfo>False</DebugInfo>
     </None>
-    <None Include="styles\sass\_bootstrap.scss" />
+    <None Include="styles\sass\_bootstrap.scss">
+      <Compile>True</Compile>
+      <Minify>True</Minify>
+      <IgnoreWarnings>False</IgnoreWarnings>
+      <IgnoreErrors>False</IgnoreErrors>
+      <CompileStyle>Nested</CompileStyle>
+      <DebugInfo>False</DebugInfo>
+    </None>
     <Content Include="Views\Home\Travel.cshtml" />
     <Content Include="Views\Home\Representatives.cshtml" />
     <Content Include="Views\Home\Students.cshtml" />
@@ -5324,8 +5363,22 @@
     <Content Include="Views\Home\Alumni.cshtml" />
     <Content Include="Views\Home\GlobalPress.cshtml" />
     <Content Include="Views\Home\CorporateEngagement.cshtml" />
-    <None Include="styles\sass\sheets\_layout.scss" />
-    <None Include="styles\sass\sheets\_ie8.scss" />
+    <None Include="styles\sass\sheets\_layout.scss">
+      <Compile>True</Compile>
+      <Minify>True</Minify>
+      <IgnoreWarnings>False</IgnoreWarnings>
+      <IgnoreErrors>False</IgnoreErrors>
+      <CompileStyle>Nested</CompileStyle>
+      <DebugInfo>False</DebugInfo>
+    </None>
+    <None Include="styles\sass\sheets\_ie8.scss">
+      <Compile>True</Compile>
+      <Minify>True</Minify>
+      <IgnoreWarnings>False</IgnoreWarnings>
+      <IgnoreErrors>False</IgnoreErrors>
+      <CompileStyle>Nested</CompileStyle>
+      <DebugInfo>False</DebugInfo>
+    </None>
     <None Include="styles\tenants\suny.edu\ie8.scss">
       <Compile>True</Compile>
       <Minify>True</Minify>
@@ -5409,11 +5462,46 @@
       <CompileStyle>Nested</CompileStyle>
       <DebugInfo>False</DebugInfo>
     </None>
-    <None Include="styles\sass\sheets\_forms.scss" />
-    <None Include="styles\sass\_future.scss" />
-    <None Include="styles\sass\sheets\_layout-footer.scss" />
-    <None Include="styles\sass\sheets\_layout-banner.scss" />
-    <None Include="styles\sass\sheets\_layout-content.scss" />
+    <None Include="styles\sass\sheets\_forms.scss">
+      <Compile>True</Compile>
+      <Minify>True</Minify>
+      <IgnoreWarnings>False</IgnoreWarnings>
+      <IgnoreErrors>False</IgnoreErrors>
+      <CompileStyle>Nested</CompileStyle>
+      <DebugInfo>False</DebugInfo>
+    </None>
+    <None Include="styles\sass\_future.scss">
+      <Compile>True</Compile>
+      <Minify>True</Minify>
+      <IgnoreWarnings>False</IgnoreWarnings>
+      <IgnoreErrors>False</IgnoreErrors>
+      <CompileStyle>Nested</CompileStyle>
+      <DebugInfo>False</DebugInfo>
+    </None>
+    <None Include="styles\sass\sheets\_layout-footer.scss">
+      <Compile>True</Compile>
+      <Minify>True</Minify>
+      <IgnoreWarnings>False</IgnoreWarnings>
+      <IgnoreErrors>False</IgnoreErrors>
+      <CompileStyle>Nested</CompileStyle>
+      <DebugInfo>False</DebugInfo>
+    </None>
+    <None Include="styles\sass\sheets\_layout-banner.scss">
+      <Compile>True</Compile>
+      <Minify>True</Minify>
+      <IgnoreWarnings>False</IgnoreWarnings>
+      <IgnoreErrors>False</IgnoreErrors>
+      <CompileStyle>Nested</CompileStyle>
+      <DebugInfo>False</DebugInfo>
+    </None>
+    <None Include="styles\sass\sheets\_layout-content.scss">
+      <Compile>True</Compile>
+      <Minify>True</Minify>
+      <IgnoreWarnings>False</IgnoreWarnings>
+      <IgnoreErrors>False</IgnoreErrors>
+      <CompileStyle>Nested</CompileStyle>
+      <DebugInfo>False</DebugInfo>
+    </None>
     <Content Include="Views\Shared\_LayoutCss.cshtml" />
     <Content Include="Views\Shared\_SampleVerticalContent.cshtml" />
     <None Include="styles\tenants\suny.edu\forms.scss" />

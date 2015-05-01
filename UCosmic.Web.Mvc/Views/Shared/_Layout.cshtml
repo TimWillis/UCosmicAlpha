@@ -89,7 +89,7 @@
                 </li>*@
                 <li class="students">
                     @{
-                        var studentHref = Url.Action(hasStyleDomain ? MVC.Students.TenantIndex(styleDomain) : MVC.Students.Index());
+                        var studentHref = Url.Action(hasStyleDomain ? MVC.Students.Table(styleDomain) : MVC.Students.Table());
                     }
                     <a href="@studentHref">Student Mobility</a>
                 </li>

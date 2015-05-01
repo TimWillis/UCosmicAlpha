@@ -15,13 +15,19 @@ namespace UCosmic.Web.Mvc.Models
         public string termDescription {get; set;}
         public DateTime termEnd {get; set;}
         public DateTime termStart {get; set;}
-        public string countryCode {get; set;}
+        public string country {get; set;}
+        //Student degree program
         public string progCode {get; set;}
         public string progDescription {get; set;}
-        public string ucosmicOfficialName {get; set;}
-        public string ucosmicCode {get; set;}
-        public string ucosmicForeignOfficialName {get; set;}
-        public string ucosmicForeignCode {get; set;}
+        //Parent institution that is logged into uCosmic
+        public string uCosmicAffiliation { get; set; }
+        public int uCosmicAffiliationCode { get; set; }
+        //Students institution -- this is the campus
+        public string uCosmicStudentAffiliation { get; set; }
+        public int uCosmicStudentAffiliationCode { get; set; }
+        //Foreign affiliation... This is optional
+        public string uCosmicForeignAffiliation {get; set; }
+        public int uCosmicForeignAffiliationCode{get;set;}
     }
 
     public class StudentJSONApi

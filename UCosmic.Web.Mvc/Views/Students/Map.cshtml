@@ -1,270 +1,571 @@
 ﻿@using System.Globalization
 @using UCosmic.Web.Mvc.Models
 
-@model ActivitySearchMapModel
 
 @{
     ViewBag.Title = "Search Activities";
 }
 
-
-
 @section bib
 {
     <nav class="bib">
-        @Html.Partial(MVC.Employees.Views._Bib, new EmployeesBibNavModel { Activities = true })
+        @Html.Partial(MVC.Students.Views._Bib, new StudentsBibNavModel { })
     </nav>
 }
 
-
-
 @section styles
 {
-    <link href="~/styles/sass/sheets/employees/activities-table.css" rel="stylesheet" />
-    <style>
-        .inactive {
-            color: gray;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="~/styles/sass/sheets/employees/summary.css" />
+
 }
 
+<style>
+    code {
+      color: #007000;
+    }
+    google-chart {
+      height: 300px;
+      width: 400px;
+    }
+    #selection-demo {
+      position: relative;
+      height: 300px;
+    }
+    #selection-chart {
+      float: left;
+    }
+    #selection-display {
+      display: inline-block;
+      position: relative;
+      top: 50%;
+    }
+  </style>
 
 
-@section scripts
-{
-    <script src="~/scripts/oss/linq.js"></script>
-    @*<script src="~/scripts/app/Pager.js"></script>*@
-    <script src="~/scripts/app/Spinner.js"></script>
-    <script>
-        @{ Html.RenderPartial(MVC.JavaScriptRoutes.Views.Places); }
-        @{ Html.RenderPartial(MVC.JavaScriptRoutes.Views.Establishments); }
-    </script>
-
-    @Scripts.Render("~/bundles/activities/map")
-
-    <script>
-
-        ko.bindingHandlers.stopBinding = {
-            init: function () {
-                return { controlsDescendantBindings: true };
-            }
-        };
-
-        ko.virtualElements.allowedBindings.stopBinding = true;
-        var settings = {
-            input: $.parseJSON('@Html.Raw(Html.SerializeObject(Model.Input))'),
-            output: $.parseJSON('@Html.Raw(Html.SerializeObject(Model))'),
-            activityTypes: $.parseJSON('@Html.Raw(Html.SerializeObject(Model.ActivityTypes))'),
-            tenantId: parseInt('@ViewBag.EmployeesEstablishmentId'),
-            ancestorId: parseInt('@ViewBag.AncestorId'),
-        };
-        var viewModel = new Activities.ViewModels.MapSearch(settings, $.parseJSON('@Html.Raw(Html.SerializeObject(Model))'));
-        viewModel.applyBindings(document.getElementById('activity_search_form'));
-        @*var searchMap = new Activities.ViewModels.SearchMap($.parseJSON('@Html.Raw(Html.SerializeObject(Model))'));
-        searchMap.applyBindings(document.getElementById('searchMap'));*@
-        //var test = new Activities.ViewModels.SearchMap(settings.output);
-    </script>
-}
+<link rel="import" href="~/components/Polymer/bower_components/polymer/polymer.html">
+<link rel="import" href="~/components/Polymer/bower_components/google-apis/google-apis.html">
+<link rel="import" href="~/components/Polymer/bower_components/core-ajax/core-ajax.html" />
 
 
 
-<div class="content fixed to-top" data-current-module="employees">
-    <form class="group" method="GET" id="activity_search_form" data-bind="jQuery: '$form', submit: _submitForm">
+<div class="content fixed to-top" data-current-module="students">
+    <form class="group" method="GET">
         <div class="on-left from-top">
-            @* HEADING & PIVOT RADIOS *@
             <div class="group" style="height:30px;">
                 <div class="on-left">
                     <header style=" margin-bottom:0px;">
                         <h1>
-                            Advanced Search for Activities
+                            Student Mobility
                         </h1>
                     </header>
                 </div>
-                <div class="on-right" style="margin-top: 8px;">
-                    <a data-bind="click: resetSearch" class="restore-underline">Reset filters</a>
+
+                <div class="on-right">
+                    <a href="/@ViewBag.StudentsDomain/students/map/" class="restore-underline">Reset search</a>
                 </div>
             </div>
 
-            @* KEYWORD TEXT BOX *@
-            <table style="border: none; border-collapse: collapse; width: 100%;">
-                <tr>
-                    <td style="width: 95%;">
-                        <div class="field" style="margin-bottom: 0;">
-                            <input type="search" value="@Model.Input.Keyword" placeholder="Narrow all displayed activities by keyword" name="keyword"
-                                   data-bind="event: { search: onKeywordInputSearchEvent }, value: keyword" />
-                        </div>
-                    </td>
-                    <td style="text-align: right;">
-                        <div class="field" style="margin-bottom: 0; margin-left: 12px;">
-                            <input type="submit" value="Search" title="Click here or press the enter key to search." style="margin-right: 0;" />
-                        </div>
-                    </td>
-                </tr>
-            </table>
+           <!-- <polymer-element name="activity-map" attributes="pager resp url table-headers domain">
+                <template>
+                    <link href="~/styles/reset.css" rel="stylesheet" />
+                    <link rel="stylesheet" type="text/css" href="~/styles/sass/sheets/employees/summary.css" />
+
+                    <core-ajax id="cajax" url="{{url}}" params='{{urlParams}}' loading='{{loading}}' auto on-core-response="{{resp}}"
+                               attributes="urlParams"></core-ajax>
+                    <div id="regions_div" style="width: 100%; height: 500px;"></div>
+
+                </template>
+                <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+                <script>
+                    Polymer('activity-map',
+                    {
+      
+                        data : [[]],
+
+                        drawRegionsMap: function () {
+                            google.load("visualization", "1", { packages: ["geochart"] });
+                            google.setOnLoadCallback(this.drawRegionsMap);
+
+                            var dataTable = google.visualization.arrayToDataTable(
+                                this.data
+                            );
+
+                            var options = {};
+
+                            
+                            var chart = new google.visualization.GeoChart(this.$.regions_div);
+
+                            chart.draw(dataTable, options);
+                        },
+
+                        filterBy: function (field, sel) {
+                            switch (field) {
+                                case "Campus":
+                                    if (sel.value == 'All Campuses') {
+                                        this.urlParams.campus = "%%"
+                                    } else {
+                                        this.urlParams.campus = sel.value;
+                                    }
+                                    break;
+                                case "Continent":
+                                    if (sel.value == 'All Continents') {
+                                        this.urlParams.FContinent = "%%"
+                                    } else {
+                                        this.urlParams.FContinent = sel.value;
+                                    }
+                                    break;
+                                case "Country":
+                                    if (sel.value == 'All Countries') {
+                                        this.urlParams.FCountry = "%%"
+                                    } else {
+                                        this.urlParams.FCountry = sel.value;
+                                    }
+                                    break;
+                                case "Level":
+                                    if (sel.value == 'All Levels') {
+                                        this.urlParams.FLevel = "%%"
+                                    } else {
+                                        this.urlParams.FLevel = sel.value;
+                                    }
+                                    break;
+                                case "Program":
+                                    this.urlParams.FDegree = sel.value;
+                                    break;
+
+                                case "Status":
+                                    this.urlParams.FStatus = sel.value;
+                                    break;
+                                case "StartDate":
+                                    this.urlParams.FStartDate = sel.value;
+                                    break;
+                                case "EndDate":
+                                    this.urlParams.FEndDate = sel.value;
+                                    break;
+                            }
+                            this.refresh();
+                        },
+
+                        changeLevelBy: function (sel) {
+                            //Select orderBy and direction for url parameters
+                            switch (sel.target.value) {
+                                case "UG":
+                                    this.urlParams.FLevel = "UG";
+                                    break;
+                                case "GR":
+                                    this.urlParams.FLevel = "GR";
+                                    break;
+                            }
+                            this.refresh();
+
+                        },
+
+                        isSelected: function (sel) {
+                            if (parseInt(sel.target.value) == this.pager.page) return true;
+                            else return false;
+                        },
+
+                        loading: false,
+
+                        refresh: function () {
+                            this.$.cajax.go();
+                        },
+
+                        resp: function (response) {
+                            this.data = JSON.parse(response.detail.response);
+                            this.drawRegionsMap();
+                        },
+
+                        urlParams: {
+                            domain: "",
+                            campus: "%%",
+                            page: 1,
+                            pageSize: 10,
+                            orderBy: "termStart",
+                            orderDirection: "DESC",
+                            FCountry: "%%",
+                            FStartDate: "1/1/1753 12:00:00 AM", //January 1st, 1900 by default (show activities after 1900)
+                            FEndDate: "12/31/9999 11:59:59 PM", //January 1st, 9999 by default (show activities before 9999)
+                            FContinent: "%%",
+                            FDegree: "%%",
+                            FLevel: "%%",
+                            FInstitution: "%%",
+                            FStatus: "%%"
+                        },
+
+                    });
+                </script>
+            </polymer-element>-->
 
 
-            @* PAGER STATUS *@
-            <div style="height: 24px; margin-top: 8px; display: none;" data-bind="visible: loadingSpinner.isVisible">
 
-                <span style="margin-left: 12px;">
-                    <img src="~/images/icons/spinner/spinner-20-blue.gif" alt="" />
-                    <strong>Loading...</strong>
-                </span>
-            </div>
+            <!--<activity-map id="activity-map" url="~/api/students/map"></activity-map>-->
+           
+           
+            <polymer-element name="google-chart" attributes="type options urlParams cols rows data selection numberFormats">
+                <style>
+                    :host {
+                          display: -webkit-flex;
+                          display: -ms-flex;
+                          display: flex;
+                          margin: 0;
+                          padding: 0;
+                          width: 400px;
+                          height: 300px;
+                        }
 
-            @* TOTALS SUMMARY *@
-            <div style="margin: 16px 0 0 0; height: 30px; font-size: 20px;">
-                Showing
-                <strong data-bind="text: searchMap.activityCount" style="font-size: 24px;">?</strong>
-                <span data-bind="visible: searchMap.activityCount() == 1" style="display: none;">activity</span>
-                <span data-bind="visible: searchMap.activityCount() != 1">activities</span>
-                in
-                <strong data-bind="text: searchMap.locationCount" style="font-size: 24px;">?</strong>
-                <span data-bind="visible: searchMap.locationCount() == 1" style="display: none;">location.</span>
-                <span data-bind="visible: searchMap.locationCount() != 1">locations.</span>
-            </div>
+                        #chartdiv {
+                          width: 100%;
+                        }
+                </style>
+                <template>
+                    <core-ajax id="ajax" handleas="json" url="{{data}}" params="{{urlParams}}"
+                               on-core-response="{{externalDataLoaded}}"></core-ajax>
+                    <div id="chartdiv"></div>
+                    <google-jsapi on-api-load="{{readyForAction}}"></google-jsapi>
+                </template>
 
-            @*<div style="height: 24px; margin: 8px 0 0 0;">
-                    <strong>
-                        Showing <span data-bind="text: searchMap.activityCount">?</span> activities.
-                    </strong>
-                </div>*@
-            @* MAP LENS CONTEXTUAL TOTALS SUMMARY *@
-            <div style="position:relative; top:0px; height: 0px; z-index: 1;">
-                <div style="
-                    background-color: white;
-                    padding: 2px;
-                    border: solid 2px gray;
-                    display: none;
-                    border-radius: 5px;
-                    color: black;"
-                     data-bind="visible: infoIsOpen">
-                    <div style="height:24px; padding: 4px 8px 0">
-                        <div style="float:left;"><strong>Map Information</strong></div>
-                        <div style="float:right; background-color:gray; padding:2px; border-radius:2px; cursor:pointer;" data-bind="click: infoClose">X</div>
-                    </div>
-                    <div style="padding: 4px 8px;">
-                        The map displays faculty and staff activity information tagged to international location sites.
-                        The default map view displays all USF System activities aggregated at the continental and oceanic levels.
-                        Refining a search, by keyword or a selected filter, displays a more nuanced view of activities organized by continent, region, country and/or body of water, in addition to a general “global” category.
-                        Activity location site circles are color coded according to the key below.
-                        A single activity may be tagged in more than one location, although the preferred identification is by individual country or body of water.
-                        Mouse clicking on a colored circle will display a filtered table of the individual activities referenced on the map.
-                        Refining a search from the table view will also change the activities displayed on the map.
-                    </div>
-                </div>
-            </div>
-            <table style="border: none; border-collapse: collapse; width: 100%;" cellpadding="0" cellspacing="0">
-                <tr>
-                    <td style="width: 95%;">
-                        <div style="line-height: 28px;">
-                            Numbers displayed represent known activity location sites.
-                        </div>
-                    </td>
-                    <td style="text-align: right;">
-                        <div class="field" style="margin: 0;">
-                            <input data-bind="click: infoOpen" type="button" value="Map Information" title="Click here for map information." style="margin-right: 0;" />
-                        </div>
-                    </td>
-                </tr>
-            </table>
-            <!-- ko stopBinding: true -->
-            <div id="searchMap" style="margin: 0 0 8px 0;">
+                <script>
+                    (function() {
+                        'use strict';
+                        Polymer('google-chart',{
+                           
+                       
+                        type: 'column',
+                        /**
+                         * Sets the options for the chart.
+                         *
+                         * Example:
+                         *     {
+                         *       title: "Chart title goes here",
+                         *       hAxis: {title: "Categories"},
+                         *       vAxis: {title: "Values", minValue: 0, maxValue: 2},
+                         *       legend: "none"
+                         *     }
+                         *
+                         * See [Google Visualization API reference (Chart Gallery)](https://google-developers.appspot.com/chart/interactive/docs/gallery)
+                         * for the options available to each chart type.
+                         *
+                       
+                         */
+                        options: { colorAxis: { colors: ['#b9ffb9', 'green'] } },
+                        /**
+                         * Sets the data columns for this object.
+                         *
+                         * When specifying data with `cols` you must also specify `rows`, and
+                         * not specify `data`.
+                         *
+                         * Example:
+                         *     [{label: "Categories", type: "string"},
+                         *      {label: "Value", type: "number"}]
+                         * See [Google Visualization API reference (addColumn)](https://google-developers.appspot.com/chart/interactive/docs/reference#DataTable_addColumn)
+                         * for column definition format.
+                         *
+                        
+                         */
+                        cols: null,
+                        /**
+                         * Sets the data rows for this object.
+                         *
+                         * When specifying data with `rows` you must also specify `cols`, and
+                         * not specify `data`.
+                         *
+                         * Example:
+                         *    [["Category 1", 1.0],
+                         *    ["Category 2", 1.1]]
+                         * See [Google Visualization API reference (addRow)](https://google-developers.appspot.com/chart/interactive/docs/reference#addrow)
+                         * for row format.
+                      
+                         */
+                        rows: null,
+                        /**
+                         * Sets the entire dataset for this object.
+                         * Can be used to provide the data directly, or to provide a URL from
+                         * which to request the data.
+                         *
+                         * The data format can be a two-dimensional array or the DataTable format
+                         * expected by Google Charts.
+                         * See [Google Visualization API reference (DataTable constructor)](https://google-developers.appspot.com/chart/interactive/docs/reference#DataTable)
+                         * for data table format details.
+                         *
+                         * When specifying data with `data` you must not specify `cols` or `rows`.
+                         *
+                         * Example:
+                         *    [["Categories", "Value"],
+                         *    ["Category 1", 1.0],
+                         *    ["Category 2", 1.1]]
+                     
+                         */
+                        data: null,
+                        /**
+                         * Selected datapoint(s) in the map.
+                         *
+                         * An array of objects, each with a numeric row and/or column property.
+                         * `row` and `column` are the zero-based row or column number of an item
+                         * in the data table to select.
+                         *
+                         * To select a whole column, set row to null;
+                         * to select a whole row, set column to null.
+                         *
+                         * Example:
+                         *     [{row:0,column:1}, {row:1, column:null}]
+                         *
+         
+                         */
+                        selection: [],
+                        /**
+                         * Sets the format for numbers shown in the tooltip.
+                         *
+                         * An array of objects, each with:
+                         *     - a required `col` property (zero-based column number to which formatting applies)
+                         *     - optional NumberFormat properties (`decimalSymbol`, `fractionDigits`, `groupingSymbol`, `negativeColor`,
+                         *     `negativeParens`, `pattern`, `prefix`, `suffix`)
+                         *
+                         * See [Google Visualization API reference (NumberFormat)](https://developers.google.com/chart/interactive/docs/reference#numberformatter) for details.
+                         *
+                         * Example:
+                         *     [{col:1, pattern: '#,###%', fractionDigits: 2 }, {col: 2, prefix: '$', groupingSymbol: ','}]
+                         *
+                 
+                         */
+                        numberFormats: null,
+                        chartTypes: null,
+                        packages: null,
+                        chartObject: null,
+                        isReady: false,
+                        canDraw: false,
+                        dataTable: null,
+                        created: function() {
+                            this.chartTypes = {};
+                            this.cols = [];
+                            this.data = [];
+                            this.options = {};
+                            this.rows = [];
+                            this.dataTable = null;
+                            this.numberFormats = [];
+                        },
+                        readyForAction: function(e, detail, sender) {
+                            this.loadPackageByChartType();
+                            google.load("visualization", "1", {
+                                packages: this.packages[this.type],
+                                callback: function() {
+                                    this.isReady = true;
+                                    this.loadChartTypes();
+                                    this.loadData();
+                                }.bind(this)
+                            });
+                        },
+                        typeChanged: function() {
+                            // Invalidate current chart object.
+                            this.chartObject = null;
+                            this.loadData();
+                        },
+                        selectionChanged: function() {
+                            if (this.chartObject && this.setSelection) {
+                                this.chartObject.setSelection(this.selection);
+                            }
+                        },
+                        observe: {
+                                rows: 'loadData',
+                                cols: 'loadData',
+                                data: 'loadData'
+                        },
+                        /**
+                         * Draws the chart.
+                         *
+                         * Called automatically on first load and whenever one of the attributes
+                         * changes. Can be called manually to handle e.g. page resizes.
+                         *
+                   
+                        */
+                        drawChart: function () {
+                            //convert the second row in the data table to integers
+                           /* var l = this.dataTable.Lf.length;
 
-                @*<div style="color:gray; font-size:.8em;" data-bind="visible: regionCount().length > 0, text: regionCount">
+                            for(var i=0; i<l; i++){
+                                this.dataTable.Lf[i].c[1].v = parseInt(this.dataTable.Lf[i].c[1].v);
+                            }*/
+                            var m = this.dataTable.getColumnRange(1).max;
+                            this.options = { colorAxis: { colors: ['#f9e4e4','#fd4141', '#ff0000'], minValue: 50, values:[0,m] }, datalessRegionColor:'#fff'};
+                            if (this.canDraw) {
+                                if (!this.options) {
+                                    this.options = { colorAxis: { colors: ['#b9ffb9', 'green'] } };;
+                                }
+                                if (!this.chartObject) {
+                                    var chartClass = this.chartTypes[this.type];
+                                    if (chartClass) {
+                                        this.chartObject = new chartClass(this.$.chartdiv);
+                                    }
+                                }
+                                if (this.chartObject) {
+                                    google.visualization.events.addOneTimeListener(this.chartObject,
+                                        'ready', function() {
+                                            this.fire('google-chart-render');
+                                        }.bind(this));
+                                    google.visualization.events.addListener(this.chartObject,
+                                        'select', function() {
+                                            this.selection = this.chartObject.getSelection();
+                                            this.fire('google-chart-select',
+                                                { selection: this.chartObject.getSelection() });
+                                        }.bind(this));
+                                    this.chartObject.draw(this.dataTable, this.options);
+                                    if (this.chartObject.setSelection){
+                                        this.chartObject.setSelection(this.selection);
+                                    }
+                                } else {
+                                    this.$.chartdiv.innerHTML = 'Undefined chart type';
+                                }
+                            }
+                            return null;
+                        },
+                        loadChartTypes: function() {
+                            this.chartTypes = {
+                                'area': google.visualization.AreaChart,
+                                'bar': google.visualization.BarChart,
+                                'bubble': google.visualization.BubbleChart,
+                                'candlestick': google.visualization.CandlestickChart,
+                                'column': google.visualization.ColumnChart,
+                                'combo': google.visualization.ComboChart,
+                                'geo': google.visualization.GeoChart,
+                                'histogram': google.visualization.Histogram,
+                                'line': google.visualization.LineChart,
+                                'pie': google.visualization.PieChart,
+                                'scatter': google.visualization.ScatterChart,
+                                'stepped-area': google.visualization.SteppedAreaChart,
+                                'table': google.visualization.Table,
+                                'gauge': google.visualization.Gauge
+                            };
+                        },
+                        loadPackageByChartType: function() {
+                            this.packages = {
+                                'area': 'corechart',
+                                'bar': 'corechart',
+                                'bubble': 'corechart',
+                                'candlestick': 'corechart',
+                                'column': 'corechart',
+                                'combo': 'corechart',
+                                'geo': 'corechart',
+                                'histogram': 'corechart',
+                                'line': 'corechart',
+                                'pie': 'corechart',
+                                'scatter': 'corechart',
+                                'stepped-area': 'corechart',
+                                'table': 'table',
+                                'gauge': 'gauge'
+                            };
+                        },
+                        loadData: function() {
+                            this.canDraw = false;
+                            if (this.isReady) {
+                                if (typeof this.data == 'string' || this.data instanceof String) {
+                                    // Load data asynchronously, from external URL.
+                                    this.$.ajax.go();
+                                    
+                                } else {
+                                    var dataTable = this.createDataTable();
+                                    this.canDraw = true;
+                                    if (dataTable) {
+                                        this.dataTable = dataTable;
+                                        this.drawChart();
+                                    }
+                                }
+                            }
+                        },
+                        externalDataLoaded: function(e, detail, sender) {
+                            var dataTable = this.createDataTable(this.$.ajax.response);
+                            this.canDraw = true;
+                            this.dataTable = dataTable;
+                            this.drawChart();
+                        },
+                        createDataTable: function(data) {
+                            var dataTable = null;
+                            // If a data object was not passed to this function, default to the
+                            // chart's data attribute. Passing a data object is necessary for
+                            // cases when the data attribute is a URL pointing to an external
+                            // data source.
+                            if (!data) {
+                                data = this.data;
+                            }
 
-                    </div>*@
-                <div data-bind="visible: continentCode() != 'any' || countryCode() != 'any'" style="line-height: 16px;">
-                    @*<strong data-bind="text: status.count">?</strong>
-                        <span data-bind="visible: status.count() == 1" style="display: none;">activity</span>
-                        <span data-bind="visible: status.count() != 1">activities</span>*@
+                            var l = data.length;
+                            for (var i = 1; i < l; i++) {
+                                data[i][1] = parseInt(data[i][1]);
+                            }
 
-                    <span style="display: inline-block; background-color: #ddd; padding: 4px 8px; border-radius: 4px; border: solid 1px #999;">
-                        <strong data-bind="text: continentName" style="">?</strong>
-                        <img src="~/images/icons/closer/closer-16-dark.png" title="Remove this search filter" alt="Remove this search filter"
-                             style="cursor: pointer; vertical-align: middle;" data-bind="click: clearFilter" />
-                    </span>
-                </div>
-            </div>
+                            if (this.rows && this.rows.length > 0 && this.cols &&
+                                this.cols.length > 0) {
+                                // Create the data table from cols and rows.
+                                dataTable = new google.visualization.DataTable();
+                                dataTable.cols = this.cols;
+                                for (var i = 0; i < this.cols.length; i++) {
+                                    dataTable.addColumn(this.cols[i]);
+                                }
+                                dataTable.addRows(this.rows);
+                            } else {
+                                // Create dataTable from the passed data or the data attribute.
+                                // Data can be in the form of raw DataTable data or a two
+                                // dimensional array.
+                                if (data.rows && data.cols) {
+                                    dataTable = new google.visualization.DataTable(data);
+                                } else if (data.length > 0) {
+                                    dataTable = google.visualization.arrayToDataTable(data);
+                                }
+                            }
+                            // Apply number formats to designated columns in dataTable
+                            if (this.numberFormats && this.numberFormats.length){
+                                this.applyNumberFormats(dataTable);
+                            }
+                            return dataTable;
+                        },
+                        applyNumberFormats: function(dataTable){
+                            for (var i = 0; i < this.numberFormats.length; i++) {
+                                var format = this.numberFormats[i];
 
-            <div id="google_map_canvas" style="height: 500px; cursor: inherit;">
-            </div>
-            <!-- /ko -->
-            <div style="width: 100%;
-                    margin: 4px;
-                    color: black;">
-                <span style="height:24px; ">
-                    <div style="width:10px; background-color: #51524F; float:left;">&nbsp;</div>
-                    <div data-bind="css: { inactive: searchMap.placeFilter() == 'waters' }" style="float:left; margin: 0 16px 0 4px;">Continents</div>
-                </span>
-                <span style="height:24px;">
-                    <div style="width:10px; background-color: #5F6CFC; float:left;">&nbsp;</div>
-                    <div style="float:left; margin: 0 16px 0 4px;">Bodies of water</div>
-                </span>
-                <span style="height:24px;">
-                    <div style="width:10px; background-color: #5DC350; float:left;">&nbsp;</div>
-                    <div data-bind="css: { inactive: searchMap.placeFilter() == 'continents' || searchMap.placeFilter() == 'waters' }" style="float:left;margin: 0 16px 0 4px;">Countries</div>
-                </span>
-                <span style="height:24px;">
-                    <div style="width:10px; background-color: #F57169; float:left;">&nbsp;</div>
-                    <div data-bind="css: { inactive: searchMap.placeFilter() == 'continents' || searchMap.placeFilter() == 'waters' }" style="float:left; margin: 0 16px 0 4px;">Regions</div>
-                </span>
-                <span style="height:24px;">
-                    <div style="width:10px; background-color: #E9AE4F; float:left;">&nbsp;</div>
-                    <div data-bind="css: { inactive: searchMap.placeFilter() == 'waters' || searchMap.continentCode() != 'any' }" style="float:left; margin-left:4px;">Global</div>
-                </span>
-            </div>
-            @*<div style="position:relative; top:-40px;">
-                    <div style="width: 24px;
-                    background-color: white;
-                    float: right;
-                    padding: 2px;
-                    border: solid 2px gray;
-                    border-radius: 5px;
-                    color: black;
-                    cursor: pointer;"
-                         data-bind="click: keyOpen, visible: !keyIsOpen()">
-                        Key
-                    </div>
-                    <div style="width: 152px;
-                    background-color: white;
-                    float: right;
-                    padding: 2px;
-                    border: solid 2px gray;
-                    display: none;
-                    border-radius: 5px;
-                    color: black;
-                    position: relative;
-                    top: -124px;"
-                         data-bind="visible: keyIsOpen">
-                        <div style="height:24px;">
-                            <div style="float:left;">Key</div>
-                            <div style="float:right; background-color:gray; padding:2px; border-radius:2px; cursor:pointer;" data-bind="click: keyClose">X</div>
-                        </div>
-                        <div style="height:24px;">
-                            <div style="width:10px; background-color: #51524F; float:left;">&nbsp;</div>
-                            <div data-bind="css: { inactive: searchMap.placeFilter() == 'waters' }" style="float:left; margin-left:4px;">Continents</div>
-                        </div>
-                        <div style="height:24px;">
-                            <div style="width:10px; background-color: #5F6CFC; float:left;">&nbsp;</div>
-                            <div data-bind="css: { inactive: (searchMap.continentCode() != 'any' && searchMap.placeFilter() != 'waters') }" style="float:left; margin-left:4px;">Bodies of water</div>
-                        </div>
-                        <div style="height:24px;">
-                            <div style="width:10px; background-color: #5DC350; float:left;">&nbsp;</div>
-                            <div data-bind="css: { inactive: searchMap.placeFilter() == 'continents' || searchMap.placeFilter() == 'waters' }" style="float:left; margin-left:4px;">Countries</div>
-                        </div>
-                        <div style="height:24px;">
-                            <div style="width:10px; background-color: #F57169; float:left;">&nbsp;</div>
-                            <div data-bind="css: { inactive: searchMap.placeFilter() == 'continents' || searchMap.placeFilter() == 'waters' || searchMap.continentCode() != 'any' }" style="float:left; margin-left:4px;">Regions</div>
-                        </div>
-                        <div style="height:24px;">
-                            <div style="width:10px; background-color: #E9AE4F; float:left;">&nbsp;</div>
-                            <div data-bind="css: { inactive: searchMap.placeFilter() == 'continents' || searchMap.placeFilter() == 'waters' || searchMap.continentCode() != 'any' }" style="float:left; margin-left:4px;">Global</div>
-                        </div>
-                    </div>
-                </div>*@
+                                // If valid column is given, create formatter object and apply to column in dataTable
+                                if (format.col && format.col < dataTable.getNumberOfColumns()){
+                                    var formatter = new google.visualization.NumberFormat({
+                                        decimalSymbol: format.decimalSymbol,
+                                        fractionDigits: format.fractionDigits,
+                                        groupingSymbol: format.groupingSymbol,
+                                        negativeColor: format.negativeColor,
+                                        negativeParens: format.negativeParens,
+                                        pattern: format.pattern,
+                                        prefix: format.prefix,
+                                        suffix: format.suffix
+                                    });
+                                    formatter.format(dataTable, format.col);
+                                }
+                            }
+                        },
+
+                        urlParams: {
+                            domain: "",
+                            campus: "%%",
+                            page: 1,
+                            pageSize: 10,
+                            orderBy: "termStart",
+                            orderDirection: "DESC",
+                            FCountry: "%%",
+                            FStartDate: "1/1/1753 12:00:00 AM", //January 1st, 1900 by default (show activities after 1900)
+                            FEndDate: "12/31/9999 11:59:59 PM", //January 1st, 9999 by default (show activities before 9999)
+                            FContinent: "%%",
+                            FDegree: "%%",
+                            FLevel: "%%",
+                            FInstitution: "%%",
+                            FStatus: "%%"
+                        }
+                    });
+                    })();
+                </script>
+
+            </polymer-element>
+            <google-chart type="geo" data="~/api/students/map"></google-chart>
+            
 
         </div>
+
+       
+
 
         <aside class="on-right from-top" data-fixed-scroll="root">
             <div data-fixed-scroll="anchor"></div>
@@ -285,19 +586,15 @@
                             <div class="content">
                                 <div class="field">
                                     <div>
-                                        <ul data-bind="foreach: affiliations()">
-                                            <li style="margin-bottom: 4px;display: none" data-bind="visible: $parent.hasEstablishmentSelects()">
-                                                <div>
-                                                    <select class="campusSelect" data-bind="options: options, value: value,
-                                                            optionsText: 'text', optionsValue: 'value', jQuery: '$select',
-                                                            attr: { id: 'campusSelect' + $index() }"
-                                                            style="padding: 1px; margin: initial; height: auto; width: 100%; font-size: 14px;">
-                                                        <option>[Loading...]</option>
-                                                    </select>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                        <span data-bind="visible: !hasEstablishmentSelects()">Loading...</span>
+                                        <select class="campusSelect" style="padding: 1px; margin: initial; height: auto; width: 100%; font-size: 14px;" onchange="updateMap('campus', this)">
+                                            <option value="%%">All Campuses</option>
+                                            @{foreach (var o in ViewBag.campus)
+                                            {
+                                                <option value="@o.OfficialName">@o.OfficialName</option>
+                                            }
+                                            }
+                                        </select>
+
                                         <input type="hidden" data-bind="value: selectedEstablishment" name="ancestorid" />
                                     </div>
                                 </div>
@@ -312,176 +609,130 @@
                             <div class="group no-link">
                                 <span class="arrow"></span>
                                 <span class="text" style="border-radius: 0;">
-                                    Filter by location
-                                    <img src="~/images/icons/spinner/spinner-20-blue-on-ddd.gif" alt=""
+                                    Filter options
+                                    <img src="/images/icons/spinner/spinner-20-blue-on-ddd.gif" alt=""
                                          style="margin-left: 4px; display: none;" data-bind="visible: loadingSpinner.isVisible" />
                                 </span>
                             </div>
                         </li>
                         <li class="static square-bottom">
                             <div class="content">
-                                @* LOCATION AUTOCOMPLETE *@
+
                                 <div class="location combobox field">
-                                    <input name="placeNames" type="text" placeholder="[Filter by location]" data-bind="jQuery: '$location', value: placeNames"
-                                           value="@(Model.Input.PlaceNames != null && Model.Input.PlaceNames.Any() ? Model.Input.PlaceNames.First() : "")"
-                                           class="side" />
-                                    <input name="placeIds" type="hidden" data-bind="jQuery: '$placeIds'"
-                                           value="@(Model.Input.PlaceIds != null && Model.Input.PlaceIds.Any() ? Model.Input.PlaceIds.First() : (int?)null)" />
+                                    <select class="campusSelect" style="padding: 1px; margin: initial; height: auto; width: 100%; font-size: 14px;" onchange="updateMap('FContinent', this)">
+                                        <option value="%%">All Continents</option>
+                                        @{foreach (var o in ViewBag.continents)
+                                        {
+                                            <option value="@o">@o</option>
+                                        }
+                                        }
+                                    </select>
+
                                 </div>
-                                @* CONTINENTS, WATERS, AND COUNTRIES *@
-                                @*<div class="location combobox field">*@
-                                <input name="placeFilter" type="hidden" data-bind="jQuery: '$placeFilter', value: placeFilter"
-                                       value=""
-                                       class="side" />
-                                @*<select data-bind=" data-bind=" jquery '$location' "" style="" class="">
-                                        <option value="Continents">Filter by continents</option>
-                                        <option value="Waters">Filter by bodies of water</option>
-                                        <option value="Countries">Filter by countries</option>
-                                    </select>*@
-                                @*<input name="placeNames" type="text" placeholder="[Filter by location]" data-bind="jQuery: '$location'"
-                                           value="@(Model.Input.PlaceNames != null && Model.Input.PlaceNames.Any() ? Model.Input.PlaceNames.First() : "")"
-                                           class="side" />
-                                    <input name="placeIds" type="hidden" data-bind="jQuery: '$placeIds'"
-                                           value="@(Model.Input.PlaceIds != null && Model.Input.PlaceIds.Any() ? Model.Input.PlaceIds.First() : (int?)null)" />*@
-                                @*</div>*@
 
+                                <div class="location combobox field">
+                                    <select class="campusSelect" style="padding: 1px; margin: initial; height: auto; width: 100%; font-size: 14px;" onchange="updateMap('FCountry', this)">
+                                        <option value="%%">All Countries</option>
+                                        @{foreach (var o in ViewBag.countries)
+                                        {
+                                            <option value="@o">@o</option>
+                                        }
+                                        }
+                                    </select>
+                                </div>
 
-                                @* ACTIVITY TYPE CHECKBOXES *@
-                                @if (Model.ActivityTypes != null && Model.ActivityTypes.Any())
-                                {
-                                    <div class="field" style="margin-top: 12px;">
-                                        <strong>Filter by activity type</strong>
-                                        <ol style="color: #000; font-size: 13px; margin-top: 4px;">
-                                            @for (var i = 0; i < Model.ActivityTypes.Count(); i++)
-                                            {
-                                                var activityType = Model.ActivityTypes.ElementAt(i);
-                                                var isChecked = Model.Input.ActivityTypeIds == null ||
-                                                                !Model.Input.ActivityTypeIds.Any() ||
-                                                                Model.Input.ActivityTypeIds.Contains(activityType.ActivityTypeId)
-                                                    ? "checked" : null;
-                                                var checkBoxId = string.Format("activity_type_checkbox_{0}", Guid.NewGuid());
-                                                <li>
-                                                    <div class="group">
-                                                        <div class="on-left">
-                                                            <label style="cursor: pointer;" data-bind="with: activityTypeCheckBoxes()[@i]">
-                                                                <input type="checkbox" id="@checkBoxId"
-                                                                       name="activityTypeIds" value="@activityType.ActivityTypeId"
-                                                                       style="cursor: pointer;" data-bind="checked: isChecked" />
-                                                                <img title="@activityType.Text" width="14" alt="" style="margin-top: -6px; cursor: pointer;"
-                                                                     src="@Url.HttpRouteUrl(null, new { controller = "EmployeeModuleSettings", action = "GetIcon", typeId = activityType.ActivityTypeId })" />
-                                                            </label>
-                                                        </div>
-                                                        <div class="on-left" style="width: 180px; margin-left: 4px; margin-top: -2px;">
-                                                            <label style="cursor: pointer; vertical-align: top;" for="@checkBoxId">
-                                                                @activityType.Text
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            }
-                                        </ol>
-                                        <div style="margin-top: 4px;">
-                                            <input type="submit" value="Search"
-                                                   style="font-size: 14px; line-height: normal; padding: 4px 8px; margin-right: 4px;" />
-                                            @{ var checkAllDisabled = Model.Input.ActivityTypeIds == null || !Model.Input.ActivityTypeIds.Any()
-                                                                      || Model.Input.ActivityTypeIds.All(x => Model.ActivityTypes.Select(y => y.ActivityTypeId).Contains(x))
-                                                   ? "disabled" : null; }
-                                            <button type="button" class="link"
-                                                    data-bind="click: checkAllActivityTypes, disable: isCheckAllActivityTypesDisabled"
-                                                    style="font-size: 14px; line-height: normal; margin-right: 4px;" disabled="@checkAllDisabled">
-                                                Check all
-                                            </button>
-                                            <button type="button" class="link"
-                                                    data-bind="click: uncheckAllActivityTypes, disable: isUncheckAllActivityTypesDisabled"
-                                                    style="font-size: 14px; line-height: normal;">
-                                                Uncheck all
-                                            </button>
-                                        </div>
-                                    </div>
-                                }
+                                <div class="location combobox field">
+                                    <select class="campusSelect" style="padding: 1px; margin: initial; height: auto; width: 100%; font-size: 14px;" onchange="updateMap('FDegree', this)">
+                                        <option value="%%">All Programs</option>
+                                        @{foreach (var o in ViewBag.programs)
+                                        {
+                                            <option value="@o.name">@o.name</option>
+                                        }
+                                        }
+                                    </select>
+                                </div>
 
-                                @* DATE FIELDS *@
+                                <div class="field">
+                                    <select name="levelby" class="side" id="levelby" onchange="updateMap('FLevel', this)">
+                                        <option selected="selected" value="%%">All Levels of Study</option>
+                                        @{foreach (var o in ViewBag.levels)
+                                        {
+                                            <option value="@o.name">@o.name</option>
+                                        }
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="field">
+                                    <select name="levelby" class="side" id="levelby" onchange="updateMap('FStatus', this)">
+                                        <option selected="selected" value="%%">Inbound & Outbound</option>
+                                        <option value="IN">Inbound Only</option>
+                                        <option value="OUT">Outbound Only</option>
+                                    </select>
+                                </div>
+
                                 <div class="dates picker field" style="margin-top: 12px;">
                                     <strong>Filter by date(s)</strong>
-                                    <div class="group">
-                                        <div class="on-left" style="width: 110px;">
-                                            <input type="text" name="Since" placeholder="From" class="side" value="@Model.Input.Since" data-role="datepicker"
-                                                   data-bind="value: since, valueUpdate: 'afterkeydown', jQuery: '$since'" />
-                                        </div>
-                                        <div class="on-right" style="width: 110px;">
-                                            <input type="text" name="Until" placeholder="To" class="side" value="@Model.Input.Until" data-role="datepicker"
-                                                   data-bind="value: until, valueUpdate: 'afterkeydown', jQuery: '$until'" />
-                                        </div>
-                                    </div>
-                                    <div style="font-size: 12px; color: #555;">
-                                        YYYY or M/YYYY or M/D/YYYY
-                                    </div>
-                                    <div style="color: #000; font-size: 13px; line-height: 13px; margin-top: 4px;">
-                                        @{
-                                            var includeUndated = Model.Input.IncludeUndated == null ||
-                                                                 Model.Input.IncludeUndated.Value
-                                                ? "checked" : null;
-                                        }
-                                        <label style="cursor: pointer; vertical-align: top;">
-                                            <input type="checkbox" name="includeUndated" checked="@includeUndated" value="true" style="cursor: pointer;" data-bind="checked: includeUndated" /> Include undated activities
-                                            @*<input type="hidden" name="includeUndated" value="false" />*@
-                                        </label>
-                                    </div>
-                                    <div style="margin-top: 8px">
-                                        @{
-                                            var clearSinceDisabled = string.IsNullOrWhiteSpace(Model.Input.Since) ? "disabled" : null;
-                                            var clearUntilDisabled = string.IsNullOrWhiteSpace(Model.Input.Until) ? "disabled" : null;
-                                        }
-                                        <input type="submit" value="Search" style="font-size: 14px; line-height: normal; padding: 4px 8px; margin-right: 4px;" />
-                                        <button type="button" class="link"
-                                                data-bind="click: clearSince, disable: isClearSinceDisabled"
-                                                disabled="@clearSinceDisabled"
-                                                style="font-size: 14px; line-height: normal; margin-right: 4px;">
-                                            Clear from
-                                        </button>
-                                        <button type="button" class="link"
-                                                data-bind="click: clearUntil, disable: isClearUntilDisabled"
-                                                disabled="@clearUntilDisabled"
-                                                style="font-size: 14px; line-height: normal;">
-                                            Clear to
-                                        </button>
-                                    </div>
                                 </div>
+
+                                <div class="field">
+                                    <select class="campusSelect" style="padding: 1px; margin: initial; height: auto; width: 100%; font-size: 14px;" onchange="updateMap('FStartDate', this)">
+                                        <option value="1/1/1753 12:00:00 AM">Any Start Term</option>
+                                        @{foreach (var o in ViewBag.terms)
+                                        {
+                                            <option value="@o.startDate">@o.name</option>
+                                        }
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="field">
+                                    <select class="campusSelect" style="padding: 1px; margin: initial; height: auto; width: 100%; font-size: 14px;" onchange="updateMap('FEndDate',this)">
+                                        <option value="12/31/9999 11:59:59 PM">Any End Term</option>
+                                        @{foreach (var o in ViewBag.terms)
+                                        {
+                                            <option value="@o.startDate">@o.name</option>
+                                        }
+                                        }
+                                    </select>
+                                </div>
+
+
                             </div>
                         </li>
                     </ul>
-
-
-
                     <ul class="bottom">
+
                         <li>
-                            <a href="@Url.Action(MVC.Students.TenantIndex(Model.Domain))" class="group">
+                            <a href="/@ViewBag.StudentsDomain/students/table/" class="group">
                                 <span class="arrow"></span>
-                                <span class="text">Global Snapshot</span>
-                            </a>
-                        </li>
-                        <li>
-                            @{
-                                var mapUrl = Url.Action(MVC.Employees.Table());
-                                if (Request.QueryString != null && !string.IsNullOrWhiteSpace(Request.QueryString.ToString()))
-                                {
-                                    mapUrl = string.Format("{0}?{1}", mapUrl, Request.QueryString);
-                                }
-                            }
-                            <a href="@mapUrl" data-bind="attr: { href: tableUrl, title: 'Advanced Search (Table)' }" class=" group">
-                                <span class="arrow"></span>
-                                <span class="text">Advanced Search (Table)</span>
+                                <span class="text">Table</span>
                             </a>
                         </li>
                         <li class="current">
-                            <a class=" group">
+                            <a href="/@ViewBag.StudentsDomain/students/map/" class="group">
                                 <span class="arrow"></span>
-                                <span class="text">Advanced Search (Map)</span>
+                                <span class="text">Map</span>
                             </a>
                         </li>
                     </ul>
                 </nav>
             </div>
         </aside>
+
     </form>
 </div>
+
+<script>
+
+    function updateMap(attri, val) {
+        var i = document.querySelector("google-chart");
+        
+        if (i.urlParams.hasOwnProperty(attri)) {
+            i.urlParams[attri] = val.value;
+        }
+
+        i.typeChanged();
+        
+    }
+</script>

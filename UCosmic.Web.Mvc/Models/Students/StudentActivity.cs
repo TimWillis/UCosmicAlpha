@@ -1,4 +1,6 @@
 ﻿using System;
+using UCosmic.Domain.Establishments;
+using System.Collections.Generic;
 
 namespace UCosmic.Web.Mvc.Models
 {

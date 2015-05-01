@@ -88,12 +88,18 @@ namespace UCosmic.Factories
 
 		public System.Int64 ExecuteWithId(DB database, string sql, object parameters, CommandType commandType)
 		{
-			var connection = GetConnection(database);
-			connection.Open();
-			var id=	connection.Query<System.Int64>(sql: sql, param: parameters, commandType: commandType).Single();
-			
-			connection.Close();
-			return id;
+            var connection = GetConnection(database);
+            try
+            {
+                connection.Open();
+                var id = connection.Query<System.Int64>(sql: sql, param: parameters, commandType: commandType).Single();
+                return id;
+
+            }
+            finally
+            {
+                connection.Close();
+            }
 		}
 
 	}
